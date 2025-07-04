@@ -10,19 +10,15 @@ import java.util.Optional;
 public sealed interface Result<T, E extends Throwable> permits Failure, Success {
 
     @SuppressWarnings("unchecked")
-    static <T, E extends Throwable> Result<T, E> catching(ThrowingSupplier<? extends T, ? extends E> supplier) {
+    static <T, E extends Throwable> Result<T, E> catching(Class<E> clazz, ThrowingSupplier<? extends T, ? extends E> supplier) {
         try {
             T value = supplier.supply();
             return new Success<>(value);
         } catch (Throwable e) {
-            try {
+            if (clazz.isInstance(e)) {
                 return new Failure<>((E) e);
-            } catch (ClassCastException ex) {
-                if (e instanceof RuntimeException re) {
-                    throw re;
-                }
-                throw new RuntimeException(e);
             }
+            throw (RuntimeException) e;
         }
     }
 
