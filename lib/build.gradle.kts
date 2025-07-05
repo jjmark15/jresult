@@ -1,8 +1,8 @@
 import net.ltgt.gradle.errorprone.errorprone
-import org.gradle.kotlin.dsl.assign
 
 plugins {
     `java-library`
+    `maven-publish`
     alias(libs.plugins.errorprone)
 }
 
@@ -44,6 +44,27 @@ tasks.withType<JavaCompile>().configureEach {
     if (name.lowercase().contains("test")) {
         options.errorprone {
             disable("NullAway")
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("jresult") {
+            from(components["java"])
+            artifactId = "jresult"
+            version = System.getenv("JRESULT_VERSION")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/jjmark15/jresult")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
