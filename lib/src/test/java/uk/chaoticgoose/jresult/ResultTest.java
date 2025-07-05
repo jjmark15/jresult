@@ -15,14 +15,14 @@ class ResultTest {
     void handlesNonThrowingAction() {
         Result<Integer, AnException> result = Result.catching(AnException.class, this::nonThrowingMethod);
         assertThat(result.value()).hasValue(VALUE);
-        assertThat(result.throwable()).isEmpty();
+        assertThat(result.exception()).isEmpty();
     }
 
     @Test
     void catchesThrowingAction() {
         Result<Integer, AnException> result = Result.catching(AnException.class, this::throwingMethod);
         assertThat(result.value()).isEmpty();
-        assertThat(result.throwable()).hasValue(EXCEPTION);
+        assertThat(result.exception()).hasValue(EXCEPTION);
     }
 
     @Test

@@ -7,14 +7,14 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 @NullMarked
-public sealed interface Result<T, E extends Throwable> permits Failure, Success {
+public sealed interface Result<T, E extends Exception> permits Failure, Success {
 
     @SuppressWarnings("unchecked")
-    static <T, E extends Throwable> Result<T, E> catching(Class<E> clazz, ThrowingSupplier<? extends T, ? extends E> supplier) {
+    static <T, E extends Exception> Result<T, E> catching(Class<E> clazz, ThrowingSupplier<? extends T, ? extends E> supplier) {
         try {
             T value = supplier.supply();
             return new Success<>(value);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             if (clazz.isInstance(e)) {
                 return new Failure<>((E) e);
             }
@@ -34,7 +34,7 @@ public sealed interface Result<T, E extends Throwable> permits Failure, Success 
         return value().orElse(null);
     }
 
-    default Optional<E> throwable() {
+    default Optional<E> exception() {
         return switch (this) {
             case Success<T, E> v -> Optional.empty();
             case Failure<T, E> f -> Optional.of(f.cause);
@@ -42,8 +42,8 @@ public sealed interface Result<T, E extends Throwable> permits Failure, Success 
     }
 
     @Nullable
-    default E throwableOrNull() {
-        return throwable().orElse(null);
+    default E exceptionOrNull() {
+        return exception().orElse(null);
     }
 
     default T valueOrThrow() throws E {
@@ -54,7 +54,7 @@ public sealed interface Result<T, E extends Throwable> permits Failure, Success 
     }
 
     @NullMarked
-    interface ThrowingSupplier<T, E extends Throwable> {
+    interface ThrowingSupplier<T, E extends Exception> {
         T supply() throws E;
     }
 }
