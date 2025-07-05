@@ -1,0 +1,5 @@
+[tools]
+jreleaser = "latest"
+
+[_]
+"$schema" = "https://mise.jdx.dev/schema/mise.json"

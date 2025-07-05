@@ -1,0 +1,49 @@
+[INFO]  JReleaser 1.19.0
+------------------------------------------------------------
+jreleaser 1.19.0
+------------------------------------------------------------
+Build time:   2025-06-30 18:28:25Z
+Revision:     ecaef0d76d84f702c96e129073966bafa145456a
+JVM:          21.0.6 (Eclipse Adoptium 21.0.6+7-LTS)
+------------------------------------------------------------
+[INFO]  Configuring with .jreleaser.yml
+[INFO]    - basedir set to /Users/chaoticgoose/dev/jresult/lib
+[INFO]    - outputdir set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser
+[INFO]  Reading configuration
+[DEBUG]   - basedir set to /Users/chaoticgoose/dev/jresult/lib
+[DEBUG]   - baseOutputDirectory set to /Users/chaoticgoose/dev/jresult/lib/out
+[DEBUG]   - outputDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser
+[DEBUG]   - checksumDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/checksums
+[DEBUG]   - catalogsDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/catalogs
+[DEBUG]   - signaturesDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/signatures
+[DEBUG]   - prepareDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/prepare
+[DEBUG]   - packageDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/package
+[DEBUG]   - downloadDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/download
+[DEBUG]   - assembleDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/assemble
+[DEBUG]   - artifactsDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/artifacts
+[DEBUG]   - deployDirectory set to /Users/chaoticgoose/dev/jresult/lib/out/jreleaser/deploy
+[INFO]  git-root-search set to false
+org.eclipse.jgit.errors.RepositoryNotFoundException: repository not found: /Users/chaoticgoose/dev/jresult/lib
+	at org.eclipse.jgit.lib.BaseRepositoryBuilder.build(BaseRepositoryBuilder.java:627)
+	at org.eclipse.jgit.api.Git.open(Git.java:93)
+	at org.eclipse.jgit.api.Git.open(Git.java:73)
+	at org.jreleaser.sdk.git.GitSdk.open(GitSdk.java:79)
+	at org.jreleaser.sdk.git.GitSdk.commit(GitSdk.java:176)
+	at org.jreleaser.sdk.git.GitSdk.head(GitSdk.java:172)
+	at org.jreleaser.engine.context.ModelConfigurer.configure(ModelConfigurer.java:49)
+	at org.jreleaser.engine.context.ContextCreator.create(ContextCreator.java:101)
+	at org.jreleaser.cli.AbstractModelCommand.createContext(AbstractModelCommand.java:153)
+	at org.jreleaser.cli.AbstractModelCommand.execute(AbstractModelCommand.java:93)
+	at org.jreleaser.cli.AbstractCommand.call(AbstractCommand.java:52)
+	at org.jreleaser.cli.AbstractCommand.call(AbstractCommand.java:37)
+	at picocli.CommandLine.executeUserObject(CommandLine.java:2031)
+	at picocli.CommandLine.access$1500(CommandLine.java:148)
+	at picocli.CommandLine$RunLast.executeUserObjectOfLastSubcommandWithSameParent(CommandLine.java:2469)
+	at picocli.CommandLine$RunLast.handle(CommandLine.java:2461)
+	at picocli.CommandLine$RunLast.handle(CommandLine.java:2423)
+	at picocli.CommandLine$AbstractParseResultHandler.execute(CommandLine.java:2277)
+	at picocli.CommandLine$RunLast.execute(CommandLine.java:2425)
+	at picocli.CommandLine.execute(CommandLine.java:2174)
+	at org.jreleaser.cli.Main.execute(Main.java:98)
+	at org.jreleaser.cli.Main.run(Main.java:81)
+	at org.jreleaser.cli.Main.main(Main.java:70)

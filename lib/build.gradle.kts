@@ -1,8 +1,11 @@
 import net.ltgt.gradle.errorprone.errorprone
+import org.jreleaser.model.Active
 
 plugins {
     `java-library`
     `maven-publish`
+    signing
+    id("org.jreleaser") version "1.19.0"
     alias(libs.plugins.errorprone)
 }
 
@@ -29,6 +32,10 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(24)
     }
+    sourceCompatibility = JavaVersion.VERSION_24
+    targetCompatibility = JavaVersion.VERSION_24
+    withJavadocJar()
+    withSourcesJar()
 }
 
 tasks.named<Test>("test") {
@@ -50,20 +57,68 @@ tasks.withType<JavaCompile>().configureEach {
 
 publishing {
     publications {
-        create<MavenPublication>("jresult") {
+        create<MavenPublication>("maven") {
             from(components["java"])
-            artifactId = "jresult"
-            version = System.getenv("JRESULT_VERSION")
+
+            pom {
+                name.set("JResult")
+                description.set("A Result type")
+                url.set("https://github.com/jjmark15/jresult")
+
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+
+                developers {
+                    developer {
+                        name.set("Josh Jones")
+                        email.set("ohblonddev@gmail.com")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/jjmark15/jresult.git")
+                    developerConnection.set("scm:git:ssh://github.com/jjmark15/jresult.git")
+                    url.set("https://github.com/jjmark15/jresult")
+                }
+            }
         }
     }
 
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/jjmark15/jresult")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+            name = "local"
+            url = uri("build/staging-deploy")
+        }
+    }
+}
+
+jreleaser {
+    gitRootSearch = true
+
+    announce {
+        active = Active.NEVER
+    }
+
+    signing {
+        active = Active.ALWAYS
+        armored = true
+        passphrase = System.getenv("JRELEASER_GPG_PASSPHRASE")
+        publicKey = System.getenv("JRELEASER_GPG_PUBLIC_KEY")
+        secretKey = System.getenv("JRELEASER_GPG_SECRET_KEY")
+    }
+
+    deploy {
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active = Active.ALWAYS
+                    url = "https://central.sonatype.com/api/v1/publisher"
+                    stagingRepositories = listOf("build/staging-deploy")
+                }
             }
         }
     }
