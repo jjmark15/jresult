@@ -22,6 +22,10 @@ public sealed interface Result<T, E extends Exception> permits Failure, Success 
         }
     }
 
+    static <T> Result<T, Exception> catching(ThrowingSupplier<? extends T, ? extends Exception> supplier) {
+        return catching(Exception.class, supplier);
+    }
+
     default Optional<T> value() {
         return switch (this) {
             case Success<T, E> v -> Optional.of(v.value);

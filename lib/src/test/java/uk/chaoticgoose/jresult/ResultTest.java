@@ -46,6 +46,13 @@ class ResultTest {
         });
     }
 
+    @Test
+    void catchesBaseException() {
+        Result<Integer, Exception> result = Result.catching(this::throwingMethod);
+        assertThat(result.value()).isEmpty();
+        assertThat(result.exception()).hasValue(EXCEPTION);
+    }
+
     private <T> T throwingMethod() throws AnException {
         throw EXCEPTION;
     }
