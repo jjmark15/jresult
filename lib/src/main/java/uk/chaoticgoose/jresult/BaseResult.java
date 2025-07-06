@@ -41,4 +41,12 @@ sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, Thro
     default T orElseGet(Supplier<? extends T> supplier) {
         return value().orElseGet(supplier);
     }
+
+    default boolean isSuccess() {
+        return this instanceof BaseSuccess<T,E>;
+    }
+
+    default boolean isFailure() {
+        return !isSuccess();
+    }
 }

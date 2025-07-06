@@ -88,6 +88,26 @@ class ResultTest {
         assertThat(Result.failure("failure").orElseGet(() -> 1)).isEqualTo(1);
     }
 
+    @Test
+    void isSuccessWhenSuccess() {
+        assertThat(Result.success(1).isSuccess()).isTrue();
+    }
+
+    @Test
+    void isNotSuccessWhenFailure() {
+        assertThat(Result.failure(1).isSuccess()).isFalse();
+    }
+
+    @Test
+    void isFailureWhenFailure() {
+        assertThat(Result.failure(1).isFailure()).isTrue();
+    }
+
+    @Test
+    void isNotFailureWhenSuccess() {
+        assertThat(Result.success(1).isFailure()).isFalse();
+    }
+
     private <T> T throwingMethod() throws AnException {
         throw EXCEPTION;
     }
