@@ -2,7 +2,6 @@ package uk.chaoticgoose.jresult;
 
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
@@ -31,20 +30,6 @@ public sealed interface Result<T, E> extends BaseResult<T, E> permits Failure, S
 
     static <T, E extends Exception> ThrowingFailure<T, E> throwingFailure(E cause) {
         return new ThrowingFailure<>(cause);
-    }
-
-    default Optional<T> value() {
-        return switch (this) {
-            case Success<T, E> v -> Optional.of(v.value);
-            case Failure<T, E> f -> Optional.empty();
-        };
-    }
-
-    default Optional<E> cause() {
-        return switch (this) {
-            case Success<T, E> v -> Optional.empty();
-            case Failure<T, E> f -> Optional.of(f.cause);
-        };
     }
 
     default <T2> Result<T2, E> map(Function<? super T, ? extends T2> mapper) {

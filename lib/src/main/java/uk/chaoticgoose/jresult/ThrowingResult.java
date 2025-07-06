@@ -2,7 +2,6 @@ package uk.chaoticgoose.jresult;
 
 import org.jspecify.annotations.NullMarked;
 
-import java.util.Optional;
 import java.util.function.Function;
 
 @NullMarked
@@ -29,22 +28,6 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
         return switch (this) {
             case ThrowingSuccess<T, E> v -> v.value;
             case ThrowingFailure<T, E> f -> throw f.cause;
-        };
-    }
-
-    @Override
-    default Optional<T> value() {
-        return switch (this) {
-            case ThrowingSuccess<T, E> v -> Optional.of(v.value);
-            case ThrowingFailure<T, E> _ -> Optional.empty();
-        };
-    }
-
-    @Override
-    default Optional<E> cause() {
-        return switch (this) {
-            case ThrowingSuccess<T, E> _ -> Optional.empty();
-            case ThrowingFailure<T, E> f -> Optional.of(f.cause);
         };
     }
 

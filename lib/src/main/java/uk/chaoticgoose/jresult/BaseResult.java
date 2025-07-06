@@ -9,16 +9,26 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @NullMarked
-public interface BaseResult<T, E> {
+public sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, Success, ThrowingResult {
 
-    Optional<T> value();
+    default Optional<T> value() {
+        return switch (this) {
+            case BaseSuccess<T, E> v -> Optional.of(v.value);
+            case BaseFailure<T, E> _ -> Optional.empty();
+        };
+    }
 
     @Nullable
     default T valueOrNull() {
         return value().orElse(null);
     }
 
-    Optional<E> cause();
+    default Optional<E> cause() {
+        return switch (this) {
+            case BaseSuccess<T, E> _ -> Optional.empty();
+            case BaseFailure<T, E> f -> Optional.of(f.cause);
+        };
+    }
 
     @Nullable
     default E causeOrNull() {
