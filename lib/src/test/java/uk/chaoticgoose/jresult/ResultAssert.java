@@ -5,7 +5,7 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T, E>, BaseResult<T, E>> {
+class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T, E>, BaseResult<T, E>> {
     protected ResultAssert(BaseResult<T, E> actual) {
         super(actual, ResultAssert.class);
     }
