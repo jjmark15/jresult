@@ -49,12 +49,12 @@ class ResultTest {
 
     @Test
     void mapsSuccesses() {
-        ResultAssert.assertThat(Result.catching(AnException.class, this::nonThrowingMethod).map(it -> it + 1)).hasSuccessValue(2);
+        ResultAssert.assertThat(Result.throwingSuccess(1).map(it -> it + 1)).hasSuccessValue(2);
     }
 
     @Test
     void mapsFailures() {
-        ResultAssert.assertThat(Result.catching(AnException.class, this::<Integer>throwingMethod).map(it -> it + 1)).hasFailureCause(EXCEPTION);
+        ResultAssert.assertThat(Result.<Integer, AnException>throwingFailure(EXCEPTION).map(it -> it + 1)).hasFailureCause(EXCEPTION);
     }
 
     @Test

@@ -47,7 +47,7 @@ public sealed interface Result<T, E> extends BaseResult<T, E> permits Failure, S
         };
     }
 
-    default <T2> BaseResult<T2, E> map(Function<? super T, ? extends T2> mapper) {
+    default <T2> Result<T2, E> map(Function<? super T, ? extends T2> mapper) {
         return switch (this) {
             case Failure<T, E> f -> new Failure<>(f.cause);
             case Success<T, E> s -> new Success<>(mapper.apply(s.value));
