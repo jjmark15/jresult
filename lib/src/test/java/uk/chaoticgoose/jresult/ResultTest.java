@@ -13,22 +13,18 @@ class ResultTest {
 
     @Test
     void handlesNonThrowingAction() {
-        Result<Integer, AnException> result = Result.catching(AnException.class, this::nonThrowingMethod);
-        assertThat(result.value()).hasValue(VALUE);
-        assertThat(result.exception()).isEmpty();
+        ResultAssert.assertThat(Result.catching(AnException.class, this::nonThrowingMethod)).hasSuccessValue(VALUE);
     }
 
     @Test
     void catchesThrowingAction() {
-        Result<Integer, AnException> result = Result.catching(AnException.class, this::throwingMethod);
-        assertThat(result.value()).isEmpty();
-        assertThat(result.exception()).hasValue(EXCEPTION);
+        ResultAssert.assertThat(Result.catching(AnException.class, this::throwingMethod)).hasFailureCause(EXCEPTION);
     }
 
     @Test
     void throwsCaughtException() {
-        Result<Integer, AnException> result = Result.catching(AnException.class, this::throwingMethod);
-        assertThatExceptionOfType(Exception.class).isThrownBy(result::valueOrThrow);
+        assertThatExceptionOfType(Exception.class)
+                .isThrownBy(() -> Result.catching(AnException.class, this::throwingMethod).valueOrThrow());
     }
 
     @Test
@@ -48,9 +44,17 @@ class ResultTest {
 
     @Test
     void catchesBaseException() {
-        Result<Integer, Exception> result = Result.catching(this::throwingMethod);
-        assertThat(result.value()).isEmpty();
-        assertThat(result.exception()).hasValue(EXCEPTION);
+        ResultAssert.assertThat(Result.<Integer>catching(this::throwingMethod)).hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void mapsSuccesses() {
+        ResultAssert.assertThat(Result.catching(AnException.class, this::nonThrowingMethod).map(it -> it + 1)).hasSuccessValue(2);
+    }
+
+    @Test
+    void mapsFailures() {
+        ResultAssert.assertThat(Result.catching(AnException.class, this::<Integer>throwingMethod).map(it -> it + 1)).hasFailureCause(EXCEPTION);
     }
 
     private <T> T throwingMethod() throws AnException {

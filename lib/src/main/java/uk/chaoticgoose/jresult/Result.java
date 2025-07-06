@@ -4,6 +4,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 @NullMarked
@@ -54,6 +55,13 @@ public sealed interface Result<T, E extends Exception> permits Failure, Success 
         return switch (this) {
             case Success<T, E> v -> v.value;
             case Failure<T, E> f -> throw f.cause;
+        };
+    }
+
+    default <T2> Result<T2, E> map(Function<? super T, ? extends T2> mapper) {
+        return switch (this) {
+            case Failure<T, E> f -> new Failure<>(f.cause);
+            case Success<T, E> s -> new Success<>(mapper.apply(s.value));
         };
     }
 
