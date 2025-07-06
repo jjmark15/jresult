@@ -24,6 +24,14 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
         return catching(Exception.class, supplier);
     }
 
+    static <T, E extends Exception> ThrowingSuccess<T, E> success(T value) {
+        return new ThrowingSuccess<>(value);
+    }
+
+    static <T, E extends Exception> ThrowingFailure<T, E> failure(E e) {
+        return new ThrowingFailure<>(e);
+    }
+
     default T valueOrThrow() throws E {
         return switch (this) {
             case ThrowingSuccess<T, E> v -> v.value;
