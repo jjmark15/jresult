@@ -4,7 +4,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
@@ -34,8 +33,6 @@ sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, Thro
     default E causeOrNull() {
         return cause().orElse(null);
     }
-
-    <T2> BaseResult<T2, E> map(Function<? super T, ? extends T2> mapper);
 
     default T orElse(T other) {
         return value().orElse(other);

@@ -39,11 +39,17 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
         };
     }
 
-    @Override
     default <T2> ThrowingResult<T2, E> map(Function<? super T, ? extends T2> mapper) {
         return switch (this) {
             case ThrowingSuccess<T, E> v -> new ThrowingSuccess<>(mapper.apply(v.value));
             case ThrowingFailure<T, E> f -> new ThrowingFailure<>(f.cause);
+        };
+    }
+
+    default <E2 extends Exception> ThrowingResult<T, E2> mapFailure(Function<? super E, ? extends E2> mapper) {
+        return switch (this) {
+            case ThrowingSuccess<T, E> v -> new ThrowingSuccess<>(v.value);
+            case ThrowingFailure<T, E> f -> new ThrowingFailure<>(mapper.apply(f.cause));
         };
     }
 

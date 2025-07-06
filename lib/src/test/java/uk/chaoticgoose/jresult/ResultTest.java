@@ -48,13 +48,24 @@ class ResultTest {
     }
 
     @Test
-    void mapsSuccesses() {
+    void mapsValueWhenSuccess() {
         ResultAssert.assertThat(Result.throwingSuccess(1).map(it -> it + 1)).hasSuccessValue(2);
     }
 
     @Test
-    void mapsFailures() {
+    void mapsValueWhenFailure() {
         ResultAssert.assertThat(Result.<Integer, AnException>throwingFailure(EXCEPTION).map(it -> it + 1)).hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void mapsCauseWhenSuccess() {
+        ResultAssert.assertThat(Result.throwingSuccess(1).mapFailure(RuntimeException::new)).hasSuccessValue(1);
+    }
+
+    @Test
+    void mapsCauseWhenFailure() {
+        var mapped = new RuntimeException(EXCEPTION);
+        ResultAssert.assertThat(Result.<Integer, AnException>throwingFailure(EXCEPTION).mapFailure((_) -> mapped)).hasFailureCause(mapped);
     }
 
     @Test
