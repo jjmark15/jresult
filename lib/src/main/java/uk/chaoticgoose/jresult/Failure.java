@@ -2,13 +2,9 @@ package uk.chaoticgoose.jresult;
 
 import org.jspecify.annotations.NullMarked;
 
-import static java.util.Objects.requireNonNull;
-
 @NullMarked
-public final class Failure<T, E extends Exception> implements Result<T, E> {
-    final E cause;
-
+public final class Failure<T, E> extends BaseFailure<T, E> implements Result<T, E> {
     Failure(E cause) {
-        this.cause = requireNonNull(cause);
+        super(cause);
     }
 }

@@ -22,29 +22,29 @@ class ResultTest {
     }
 
     @Test
-    void throwsCaughtException() {
+    void throwsCaughtCause() {
         assertThatExceptionOfType(Exception.class)
                 .isThrownBy(() -> Result.catching(AnException.class, this::throwingMethod).valueOrThrow());
     }
 
     @Test
     void returnsValue() throws Exception {
-        Result<Integer, AnException> result = Result.catching(AnException.class, this::nonThrowingMethod);
+        ThrowingResult<Integer, AnException> result = Result.catching(AnException.class, this::nonThrowingMethod);
         assertThat(result.valueOrThrow()).isEqualTo(VALUE);
     }
 
     @Test
     void doesNotCatchExceptionsOfDifferentType() {
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
-            Result<Integer, AnException> _ = Result.catching(AnException.class, () -> {
+            ThrowingResult<Integer, AnException> _ = Result.catching(AnException.class, () -> {
                 throw new AnotherException();
             });
         });
     }
 
     @Test
-    void catchesBaseException() {
-        ResultAssert.assertThat(Result.<Integer>catching(this::throwingMethod)).hasFailureCause(EXCEPTION);
+    void catchesBaseCause() {
+        ResultAssert.assertThat(Result.catching(this::throwingMethod)).hasFailureCause(EXCEPTION);
     }
 
     @Test
@@ -55,6 +55,26 @@ class ResultTest {
     @Test
     void mapsFailures() {
         ResultAssert.assertThat(Result.catching(AnException.class, this::<Integer>throwingMethod).map(it -> it + 1)).hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void orElseReturnsValue() {
+        assertThat(Result.success(1).orElse(2)).isEqualTo(1);
+    }
+
+    @Test
+    void orElseReturnsValueWhenFailure() {
+        assertThat(Result.failure("failure").orElse(1)).isEqualTo(1);
+    }
+
+    @Test
+    void orElseGetReturnsValue() {
+        assertThat(Result.success(1).orElseGet(() -> 2)).isEqualTo(1);
+    }
+
+    @Test
+    void orElseGetReturnsValueWhenFailure() {
+        assertThat(Result.failure("failure").orElseGet(() -> 1)).isEqualTo(1);
     }
 
     private <T> T throwingMethod() throws AnException {
