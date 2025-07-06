@@ -60,6 +60,8 @@ publishing {
         create<MavenPublication>("maven") {
             from(components["java"])
 
+            artifactId = "jresult"
+
             pom {
                 name.set("JResult")
                 description.set("A Result type")
