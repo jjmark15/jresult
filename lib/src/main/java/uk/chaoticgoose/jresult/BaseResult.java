@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @NullMarked
-public sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, ThrowingResult {
+sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, ThrowingResult {
 
     default Optional<T> value() {
         return switch (this) {
