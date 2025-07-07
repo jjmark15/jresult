@@ -12,7 +12,7 @@ sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, Thro
 
     default Optional<T> value() {
         return switch (this) {
-            case BaseSuccess<T, E> v -> Optional.of(v.value);
+            case BaseSuccess<T, E> v -> Optional.of(v.inner());
             case BaseFailure<T, E> _ -> Optional.empty();
         };
     }
@@ -25,7 +25,7 @@ sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, Thro
     default Optional<E> cause() {
         return switch (this) {
             case BaseSuccess<T, E> _ -> Optional.empty();
-            case BaseFailure<T, E> f -> Optional.of(f.cause);
+            case BaseFailure<T, E> f -> Optional.of(f.inner());
         };
     }
 

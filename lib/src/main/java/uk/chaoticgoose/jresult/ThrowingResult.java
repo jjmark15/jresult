@@ -34,22 +34,22 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
 
     default T valueOrThrow() throws E {
         return switch (this) {
-            case ThrowingSuccess<T, E> v -> v.value;
-            case ThrowingFailure<T, E> f -> throw f.cause;
+            case ThrowingSuccess<T, E> v -> v.inner();
+            case ThrowingFailure<T, E> f -> throw f.inner();
         };
     }
 
     default <T2> ThrowingResult<T2, E> map(Function<? super T, ? extends T2> mapper) {
         return switch (this) {
-            case ThrowingSuccess<T, E> v -> new ThrowingSuccess<>(mapper.apply(v.value));
-            case ThrowingFailure<T, E> f -> new ThrowingFailure<>(f.cause);
+            case ThrowingSuccess<T, E> v -> new ThrowingSuccess<>(mapper.apply(v.inner()));
+            case ThrowingFailure<T, E> f -> new ThrowingFailure<>(f.inner());
         };
     }
 
     default <E2 extends Exception> ThrowingResult<T, E2> mapFailure(Function<? super E, ? extends E2> mapper) {
         return switch (this) {
-            case ThrowingSuccess<T, E> v -> new ThrowingSuccess<>(v.value);
-            case ThrowingFailure<T, E> f -> new ThrowingFailure<>(mapper.apply(f.cause));
+            case ThrowingSuccess<T, E> v -> new ThrowingSuccess<>(v.inner());
+            case ThrowingFailure<T, E> f -> new ThrowingFailure<>(mapper.apply(f.inner()));
         };
     }
 

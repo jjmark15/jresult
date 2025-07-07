@@ -34,8 +34,8 @@ class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T
         isNotNull();
         isSuccess();
         if (actual instanceof BaseSuccess<T, E> s) {
-            if (!s.value.equals(value)) {
-                failWithMessage("Expected success value to be <%s> but was <%s>", value, s.value);
+            if (!s.inner().equals(value)) {
+                failWithMessage("Expected success value to be <%s> but was <%s>", value, s.inner());
             }
         }
         return this;
@@ -45,8 +45,8 @@ class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T
         isNotNull();
         isFailure();
         if (actual instanceof BaseFailure<T,E> f) {
-            if (!f.cause.equals(cause)) {
-                failWithMessage("Expected failure cause to be <%s> but was <%s>", cause, f.cause);
+            if (!f.inner().equals(cause)) {
+                failWithMessage("Expected failure cause to be <%s> but was <%s>", cause, f.inner());
             }
         }
         return this;

@@ -3,8 +3,5 @@ package uk.chaoticgoose.jresult;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class ThrowingSuccess<T, E extends Exception> extends BaseSuccess<T, E> implements ThrowingResult<T, E> {
-    ThrowingSuccess(T value) {
-        super(value);
-    }
+public record ThrowingSuccess<T, E extends Exception>(T inner) implements BaseSuccess<T, E>, ThrowingResult<T, E> {
 }
