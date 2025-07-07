@@ -51,12 +51,12 @@ sealed interface BaseResult<T, E> permits BaseResult.BaseSuccess, BaseResult.Bas
     }
 
     @NullMarked
-    sealed interface BaseSuccess<T, E> extends BaseResult<T, E> permits Result.Success, ThrowingResult.ThrowingSuccess {
+    sealed interface BaseSuccess<T, E> extends BaseResult<T, E> permits Result.Success, ThrowingResult.Success {
         T inner();
     }
 
     @NullMarked
-    sealed interface BaseFailure<T, E> extends BaseResult<T, E> permits Result.Failure, ThrowingResult.ThrowingFailure {
+    sealed interface BaseFailure<T, E> extends BaseResult<T, E> permits Result.Failure, ThrowingResult.Failure {
         E inner();
     }
 }

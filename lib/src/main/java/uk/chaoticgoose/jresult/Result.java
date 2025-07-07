@@ -25,11 +25,11 @@ public sealed interface Result<T, E> extends BaseResult<T, E> permits Result.Suc
         return new Failure<>(cause);
     }
 
-    static <T, E extends Exception> ThrowingResult.ThrowingSuccess<T, E> throwingSuccess(T value) {
+    static <T, E extends Exception> ThrowingResult.Success<T, E> throwingSuccess(T value) {
         return ThrowingResult.success(value);
     }
 
-    static <T, E extends Exception> ThrowingResult.ThrowingFailure<T, E> throwingFailure(E cause) {
+    static <T, E extends Exception> ThrowingResult.Failure<T, E> throwingFailure(E cause) {
         return ThrowingResult.failure(cause);
     }
 

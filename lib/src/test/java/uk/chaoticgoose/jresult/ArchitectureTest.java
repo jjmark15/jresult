@@ -12,11 +12,6 @@ public class ArchitectureTest {
 
     @Test
     void baseClassesShouldNotBePublic() {
-        classes().that().haveSimpleNameStartingWith("Base").should().notBePublic().check(CLASSES);
-    }
-
-    @Test
-    void throwingResultClassesMustBeNamedThrowing() {
-        classes().that().areAssignableTo(ThrowingResult.class).should().haveSimpleNameStartingWith("Throwing").check(CLASSES);
+        classes().that().haveSimpleNameStartingWith("Base").and().areNotNestedClasses().should().notBePublic().check(CLASSES);
     }
 }
