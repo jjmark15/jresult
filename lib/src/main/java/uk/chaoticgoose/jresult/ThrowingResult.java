@@ -5,7 +5,7 @@ import org.jspecify.annotations.NullMarked;
 import java.util.function.Function;
 
 @NullMarked
-public sealed interface ThrowingResult<T, E extends Exception> extends BaseResult<T, E> permits ThrowingSuccess, ThrowingFailure {
+public sealed interface ThrowingResult<T, E extends Exception> extends BaseResult<T, E> permits ThrowingResult.ThrowingSuccess, ThrowingResult.ThrowingFailure {
 
     @SuppressWarnings("unchecked")
     static <T, E extends Exception> ThrowingResult<T, E> catching(Class<E> clazz, ThrowingResult.ThrowingSupplier<? extends T, ? extends E> supplier) {
@@ -56,5 +56,13 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
     @NullMarked
     interface ThrowingSupplier<T, E extends Exception> {
         T supply() throws E;
+    }
+
+    @NullMarked
+    record ThrowingSuccess<T, E extends Exception>(T inner) implements BaseResult.BaseSuccess<T, E>, ThrowingResult<T, E> {
+    }
+
+    @NullMarked
+    record ThrowingFailure<T, E extends Exception>(E inner) implements BaseResult.BaseFailure<T, E>, ThrowingResult<T, E> {
     }
 }

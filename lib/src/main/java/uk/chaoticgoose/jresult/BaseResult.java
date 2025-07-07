@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @NullMarked
-sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, ThrowingResult {
+sealed interface BaseResult<T, E> permits BaseResult.BaseSuccess, BaseResult.BaseFailure, Result, ThrowingResult {
 
     default Optional<T> value() {
         return switch (this) {
@@ -48,5 +48,15 @@ sealed interface BaseResult<T, E> permits BaseSuccess, BaseFailure, Result, Thro
 
     default boolean isFailure() {
         return !isSuccess();
+    }
+
+    @NullMarked
+    sealed interface BaseSuccess<T, E> extends BaseResult<T, E> permits Result.Success, ThrowingResult.ThrowingSuccess {
+        T inner();
+    }
+
+    @NullMarked
+    sealed interface BaseFailure<T, E> extends BaseResult<T, E> permits Result.Failure, ThrowingResult.ThrowingFailure {
+        E inner();
     }
 }

@@ -16,7 +16,7 @@ class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T
 
     public ResultAssert<T, E> isFailure() {
         isNotNull();
-        if (actual instanceof BaseSuccess<T,E>) {
+        if (actual instanceof BaseResult.BaseSuccess<T,E>) {
             failWithMessage("Expected result to be a failure");
         }
         return this;
@@ -24,7 +24,7 @@ class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T
 
     public ResultAssert<T, E> isSuccess() {
         isNotNull();
-        if (actual instanceof BaseFailure<T,E>) {
+        if (actual instanceof BaseResult.BaseFailure<T,E>) {
             failWithMessage("Expected result to be a success");
         }
         return this;
@@ -33,7 +33,7 @@ class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T
     public ResultAssert<T, E> hasSuccessValue(T value) {
         isNotNull();
         isSuccess();
-        if (actual instanceof BaseSuccess<T, E> s) {
+        if (actual instanceof BaseResult.BaseSuccess<T, E> s) {
             if (!s.inner().equals(value)) {
                 failWithMessage("Expected success value to be <%s> but was <%s>", value, s.inner());
             }
@@ -44,7 +44,7 @@ class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T
     public ResultAssert<T, E> hasFailureCause(E cause) {
         isNotNull();
         isFailure();
-        if (actual instanceof BaseFailure<T,E> f) {
+        if (actual instanceof BaseResult.BaseFailure<T,E> f) {
             if (!f.inner().equals(cause)) {
                 failWithMessage("Expected failure cause to be <%s> but was <%s>", cause, f.inner());
             }

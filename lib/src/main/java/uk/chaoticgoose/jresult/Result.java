@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 @NullMarked
-public sealed interface Result<T, E> extends BaseResult<T, E> permits Success, Failure {
+public sealed interface Result<T, E> extends BaseResult<T, E> permits Result.Success, Result.Failure {
 
     static <T, E extends Exception> ThrowingResult<T, E> catching(Class<E> clazz, ThrowingSupplier<? extends T, ? extends E> supplier) {
         return ThrowingResult.catching(clazz, supplier);
@@ -25,11 +25,11 @@ public sealed interface Result<T, E> extends BaseResult<T, E> permits Success, F
         return new Failure<>(cause);
     }
 
-    static <T, E extends Exception> ThrowingSuccess<T, E> throwingSuccess(T value) {
+    static <T, E extends Exception> ThrowingResult.ThrowingSuccess<T, E> throwingSuccess(T value) {
         return ThrowingResult.success(value);
     }
 
-    static <T, E extends Exception> ThrowingFailure<T, E> throwingFailure(E cause) {
+    static <T, E extends Exception> ThrowingResult.ThrowingFailure<T, E> throwingFailure(E cause) {
         return ThrowingResult.failure(cause);
     }
 
@@ -45,5 +45,13 @@ public sealed interface Result<T, E> extends BaseResult<T, E> permits Success, F
             case Success<T, E> v -> new Success<>(v.inner());
             case Failure<T, E> f -> new Failure<>(mapper.apply(f.inner()));
         };
+    }
+
+    @NullMarked
+    record Success<T, E>(T inner) implements BaseResult.BaseSuccess<T, E>, Result<T, E> {
+    }
+
+    @NullMarked
+    record Failure<T, E>(E inner) implements BaseResult.BaseFailure<T, E>, Result<T, E> {
     }
 }
