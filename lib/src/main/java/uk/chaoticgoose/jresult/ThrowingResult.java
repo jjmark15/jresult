@@ -34,22 +34,43 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
 
     default T valueOrThrow() throws E {
         return switch (this) {
-            case ThrowingResult.Success<T, E> v -> v.inner();
-            case ThrowingResult.Failure<T, E> f -> throw f.inner();
+            case Success<T, E> v -> v.inner();
+            case Failure<T, E> f -> throw f.inner();
         };
     }
 
     default <T2> ThrowingResult<T2, E> map(Function<? super T, ? extends T2> mapper) {
         return switch (this) {
-            case ThrowingResult.Success<T, E> v -> new Success<>(mapper.apply(v.inner()));
-            case ThrowingResult.Failure<T, E> f -> new Failure<>(f.inner());
+            case Success<T, E> v -> new Success<>(mapper.apply(v.inner()));
+            case Failure<T, E> f -> new Failure<>(f.inner());
         };
+    }
+
+    default <T2, E2 extends Exception, E3 extends Exception> ThrowingResult<T2, E3> mapCatching(
+            Class<E2> clazz,
+            ThrowingFunction<T, T2, E2> mapper,
+            Function<Either<? extends E, ? extends E2>, ? extends E3> failureCombiner
+    ) {
+        return switch (this) {
+            case Success<T, E> v -> switch (ThrowingResult.catching(clazz, () -> mapper.apply(v.inner()))) {
+                case Success<T2, E2> v2 -> new Success<T2, E3>(v2.inner());
+                case Failure<T2, E2> f2 -> new Failure<T2, E3>(failureCombiner.apply(Either.right(f2.inner())));
+            };
+            case Failure<T, E> f -> new Failure<T2, E3>(failureCombiner.apply(Either.left(f.inner())));
+        };
+    }
+
+    default <T2, E3 extends Exception> ThrowingResult<T2, E3> mapCatching(
+            ThrowingFunction<T, T2, Exception> mapper,
+            Function<Either<? extends E, ? extends Exception>, ? extends E3> failureCombiner
+    ) {
+        return mapCatching(Exception.class, mapper, failureCombiner);
     }
 
     default <E2 extends Exception> ThrowingResult<T, E2> mapFailure(Function<? super E, ? extends E2> mapper) {
         return switch (this) {
-            case ThrowingResult.Success<T, E> v -> new Success<>(v.inner());
-            case ThrowingResult.Failure<T, E> f -> new Failure<>(mapper.apply(f.inner()));
+            case Success<T, E> v -> new Success<>(v.inner());
+            case Failure<T, E> f -> new Failure<>(mapper.apply(f.inner()));
         };
     }
 
@@ -67,6 +88,11 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
     @NullMarked
     interface ThrowingSupplier<T, E extends Exception> {
         T supply() throws E;
+    }
+
+    @NullMarked
+    interface ThrowingFunction<T, R, E extends Exception> {
+        R apply(T t) throws E;
     }
 
     @NullMarked

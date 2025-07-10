@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 @NullMarked
 class ResultTest {
     private static final AnException EXCEPTION = new AnException();
+    private static final AnotherException ANOTHER_EXCEPTION = new AnotherException();
     private static final int VALUE = 1;
 
     @Test
@@ -36,9 +37,7 @@ class ResultTest {
     @Test
     void doesNotCatchExceptionsOfDifferentType() {
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
-            ThrowingResult<Integer, AnException> _ = Result.catching(AnException.class, () -> {
-                throw new AnotherException();
-            });
+            ThrowingResult<Integer, AnException> _ = Result.catching(AnException.class, this::anotherThrowingMethod);
         });
     }
 
@@ -66,6 +65,41 @@ class ResultTest {
     void mapsCauseWhenFailure() {
         var mapped = new RuntimeException(EXCEPTION);
         ResultAssert.assertThat(Result.<Integer, AnException>throwingFailure(EXCEPTION).mapFailure((_) -> mapped)).hasFailureCause(mapped);
+    }
+
+    @Test
+    void combinesThrowingFailuresFromMappingWhenInitialFailureWithoutExceptionTyping() {
+        ResultAssert.assertThat(ThrowingResult.failure(EXCEPTION)
+                .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+            .hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void combinesThrowingFailuresFromMappingWhenInitialFailure() {
+        ResultAssert.assertThat(ThrowingResult.failure(EXCEPTION)
+                .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+            .hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void combinesThrowingFailuresFromMappingWhenSecondaryFailureWithoutExceptionTyping() {
+        ResultAssert.assertThat(ThrowingResult.success(1)
+                .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+            .hasFailureCause(ANOTHER_EXCEPTION);
+    }
+
+    @Test
+    void combinesThrowingFailuresFromMappingWhenSecondaryFailure() {
+        ResultAssert.assertThat(ThrowingResult.success(1)
+                .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+            .hasFailureCause(ANOTHER_EXCEPTION);
+    }
+
+    @Test
+    void combinesThrowingFailuresFromMappingWhenSuccess() {
+        ResultAssert.assertThat(ThrowingResult.<Integer, AnException>success(1)
+                .mapCatching(AnotherException.class, _ -> 2, cause -> cause.map(c -> c, c -> c)))
+            .hasSuccessValue(2);
     }
 
     @Test
@@ -137,11 +171,17 @@ class ResultTest {
         throw EXCEPTION;
     }
 
+    private <T> T anotherThrowingMethod() throws AnotherException {
+        throw ANOTHER_EXCEPTION;
+    }
+
     private Integer nonThrowingMethod() {
         return VALUE;
     }
 
-    private static class AnException extends Exception {}
+    private sealed interface FailureCauses {}
 
-    private static class AnotherException extends RuntimeException {}
+    private static final class AnException extends Exception implements FailureCauses {}
+
+    private static final class AnotherException extends RuntimeException implements FailureCauses {}
 }
