@@ -8,7 +8,7 @@ import java.util.function.Function;
 public sealed interface ThrowingResult<T, E extends Exception> extends BaseResult<T, E> permits ThrowingResult.Success, ThrowingResult.Failure {
 
     @SuppressWarnings("unchecked")
-    static <T, E extends Exception> ThrowingResult<T, E> catching(Class<E> clazz, ThrowingResult.ThrowingSupplier<? extends T, ? extends E> supplier) {
+    static <T, E extends Exception> ThrowingResult<T, E> catching(Class<E> clazz, ThrowingSupplier<? extends T, ? extends E> supplier) {
         try {
             T value = supplier.supply();
             return new Success<>(value);
@@ -20,7 +20,7 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
         }
     }
 
-    static <T> ThrowingResult<T, Exception> catching(ThrowingResult.ThrowingSupplier<? extends T, ? extends Exception> supplier) {
+    static <T> ThrowingResult<T, Exception> catching(ThrowingSupplier<? extends T, ? extends Exception> supplier) {
         return catching(Exception.class, supplier);
     }
 
@@ -53,16 +53,27 @@ public sealed interface ThrowingResult<T, E extends Exception> extends BaseResul
         };
     }
 
+    default Result<T, E> toNonThrowing() {
+        return toNonThrowing(Function.identity());
+    }
+
+    default <E2> Result<T, E2> toNonThrowing(Function<? super E, ? extends E2> mapper) {
+        return switch (this) {
+            case ThrowingResult.Success<T, E> v -> new Result.Success<>(v.inner());
+            case ThrowingResult.Failure<T, E> v -> new  Result.Failure<>(mapper.apply(v.inner()));
+        };
+    }
+
     @NullMarked
     interface ThrowingSupplier<T, E extends Exception> {
         T supply() throws E;
     }
 
     @NullMarked
-    record Success<T, E extends Exception>(T inner) implements BaseResult.BaseSuccess<T, E>, ThrowingResult<T, E> {
+    record Success<T, E extends Exception>(T inner) implements BaseSuccess<T, E>, ThrowingResult<T, E> {
     }
 
     @NullMarked
-    record Failure<T, E extends Exception>(E inner) implements BaseResult.BaseFailure<T, E>, ThrowingResult<T, E> {
+    record Failure<T, E extends Exception>(E inner) implements BaseFailure<T, E>, ThrowingResult<T, E> {
     }
 }

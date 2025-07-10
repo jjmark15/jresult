@@ -108,6 +108,31 @@ class ResultTest {
         assertThat(Result.success(1).isFailure()).isFalse();
     }
 
+    @Test
+    void toThrowingWhenSuccess() {
+        ResultAssert.assertThat(Result.success(1).toThrowing(_ -> EXCEPTION)).hasSuccessValue(1);
+    }
+
+    @Test
+    void toThrowingWhenFailure() {
+        ResultAssert.assertThat(Result.failure(1).toThrowing(_ -> EXCEPTION)).hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void toNonThrowingWhenSuccess() {
+        ResultAssert.assertThat(Result.throwingSuccess(1).toNonThrowing()).hasSuccessValue(1);
+    }
+
+    @Test
+    void toNonThrowingWhenSuccessWithCauseMapping() {
+        ResultAssert.assertThat(Result.throwingSuccess(1).toNonThrowing(_ -> 2)).hasSuccessValue(1);
+    }
+
+    @Test
+    void toNonThrowingWhenFailure() {
+        ResultAssert.assertThat(Result.throwingFailure(EXCEPTION).toNonThrowing(_ -> 1)).hasFailureCause(1);
+    }
+
     private <T> T throwingMethod() throws AnException {
         throw EXCEPTION;
     }

@@ -5,12 +5,12 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-class ResultAssert<T, E extends Exception> extends AbstractAssert<ResultAssert<T, E>, BaseResult<T, E>> {
+class ResultAssert<T, E> extends AbstractAssert<ResultAssert<T, E>, BaseResult<T, E>> {
     protected ResultAssert(BaseResult<T, E> actual) {
         super(actual, ResultAssert.class);
     }
 
-    public static <T, E extends Exception> ResultAssert<T, E> assertThat(BaseResult<T, E> actual) {
+    public static <T, E> ResultAssert<T, E> assertThat(BaseResult<T, E> actual) {
         return new ResultAssert<>(actual);
     }
 

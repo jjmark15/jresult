@@ -47,11 +47,18 @@ public sealed interface Result<T, E> extends BaseResult<T, E> permits Result.Suc
         };
     }
 
-    @NullMarked
-    record Success<T, E>(T inner) implements BaseResult.BaseSuccess<T, E>, Result<T, E> {
+    default <E2 extends Exception> ThrowingResult<T, E2> toThrowing(Function<? super E, ? extends E2> mapper) {
+        return switch (this) {
+            case Result.Success<T, E> v -> new ThrowingResult.Success<>(v.inner());
+            case Result.Failure<T, E> v -> new ThrowingResult.Failure<>(mapper.apply(v.inner()));
+        };
     }
 
     @NullMarked
-    record Failure<T, E>(E inner) implements BaseResult.BaseFailure<T, E>, Result<T, E> {
+    record Success<T, E>(T inner) implements BaseSuccess<T, E>, Result<T, E> {
+    }
+
+    @NullMarked
+    record Failure<T, E>(E inner) implements BaseFailure<T, E>, Result<T, E> {
     }
 }
