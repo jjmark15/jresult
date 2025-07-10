@@ -10,11 +10,11 @@ public sealed interface Either<T, U> {
     @NullMarked record Right<T, U>(U value) implements Either<T, U> {}
 
     static <T, U> Either<T, U> left(T value) {
-        return new Left<T, U>(value);
+        return new Left<>(value);
     }
 
     static <T, U> Either<T, U> right(U value) {
-        return new Right<T, U>(value);
+        return new Right<>(value);
     }
 
     default <V> V map(Function<T, V> leftMapper, Function<U, V> rightMapper) {

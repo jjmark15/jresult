@@ -8,12 +8,12 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @NullMarked
-sealed interface BaseResult<T, E> permits BaseResult.BaseSuccess, BaseResult.BaseFailure, Result, ThrowingResult {
+sealed interface BaseResult<T, C> permits BaseResult.BaseSuccess, BaseResult.BaseFailure, Result, ThrowingResult {
 
     default Optional<T> value() {
         return switch (this) {
-            case BaseSuccess<T, E> v -> Optional.of(v.inner());
-            case BaseFailure<T, E> _ -> Optional.empty();
+            case BaseSuccess<T, C> v -> Optional.of(v.inner());
+            case BaseFailure<T, C> _ -> Optional.empty();
         };
     }
 
@@ -22,15 +22,15 @@ sealed interface BaseResult<T, E> permits BaseResult.BaseSuccess, BaseResult.Bas
         return value().orElse(null);
     }
 
-    default Optional<E> cause() {
+    default Optional<C> cause() {
         return switch (this) {
-            case BaseSuccess<T, E> _ -> Optional.empty();
-            case BaseFailure<T, E> f -> Optional.of(f.inner());
+            case BaseSuccess<T, C> _ -> Optional.empty();
+            case BaseFailure<T, C> f -> Optional.of(f.inner());
         };
     }
 
     @Nullable
-    default E causeOrNull() {
+    default C causeOrNull() {
         return cause().orElse(null);
     }
 
@@ -43,7 +43,7 @@ sealed interface BaseResult<T, E> permits BaseResult.BaseSuccess, BaseResult.Bas
     }
 
     default boolean isSuccess() {
-        return this instanceof BaseSuccess<T,E>;
+        return this instanceof BaseSuccess<T, C>;
     }
 
     default boolean isFailure() {
@@ -51,12 +51,12 @@ sealed interface BaseResult<T, E> permits BaseResult.BaseSuccess, BaseResult.Bas
     }
 
     @NullMarked
-    sealed interface BaseSuccess<T, E> extends BaseResult<T, E> permits Result.Success, ThrowingResult.Success {
+    sealed interface BaseSuccess<T, C> extends BaseResult<T, C> permits Result.Success, ThrowingResult.Success {
         T inner();
     }
 
     @NullMarked
-    sealed interface BaseFailure<T, E> extends BaseResult<T, E> permits Result.Failure, ThrowingResult.Failure {
-        E inner();
+    sealed interface BaseFailure<T, C> extends BaseResult<T, C> permits Result.Failure, ThrowingResult.Failure {
+        C inner();
     }
 }
