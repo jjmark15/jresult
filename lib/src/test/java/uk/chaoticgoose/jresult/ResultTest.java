@@ -3,6 +3,8 @@ package uk.chaoticgoose.jresult;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 
+import java.util.NoSuchElementException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -23,15 +25,25 @@ class ResultTest {
     }
 
     @Test
-    void throwsCaughtCause() {
-        assertThatExceptionOfType(Exception.class)
-                .isThrownBy(() -> Result.catching(AnException.class, this::throwingMethod).valueOrThrow());
+    void throwingFailureThrowsCaughtCause() {
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> Result.failure(EXCEPTION).valueOrThrow());
     }
 
     @Test
-    void returnsValue() throws Exception {
-        ThrowingResult<Integer, AnException> result = Result.catching(AnException.class, this::nonThrowingMethod);
-        assertThat(result.valueOrThrow()).isEqualTo(VALUE);
+    void throwingSuccessReturnsValue() throws Exception {
+        assertThat(Result.success(VALUE).valueOrThrow()).isEqualTo(VALUE);
+    }
+
+    @Test
+    void nonThrowingFailureThrowsNoSuchElementException() {
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> Result.failure(1).valueOrThrow())
+                .withMessage("Result is a failure");
+    }
+
+    @Test
+    void nonThrowingSuccessReturnsValue() {
+        assertThat(Result.success(VALUE).valueOrThrow()).isEqualTo(VALUE);
     }
 
     @Test
@@ -83,7 +95,7 @@ class ResultTest {
 
     @Test
     void combinesThrowingFailuresFromMappingWhenSecondaryFailureWithoutExceptionTyping() {
-        ResultAssert.assertThat(ThrowingResult.success(1)
+        ResultAssert.assertThat(ThrowingResult.success(VALUE)
                 .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(ANOTHER_EXCEPTION);
     }

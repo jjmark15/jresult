@@ -3,6 +3,7 @@ package uk.chaoticgoose.jresult;
 import org.jspecify.annotations.NullMarked;
 import uk.chaoticgoose.jresult.ThrowingResult.ThrowingSupplier;
 
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
@@ -31,6 +32,13 @@ public sealed interface Result<T, C> extends BaseResult<T, C> permits Result.Suc
 
     static <T, C extends Exception> ThrowingResult.Failure<T, C> throwingFailure(C cause) {
         return ThrowingResult.failure(cause);
+    }
+
+    default T valueOrThrow() throws NoSuchElementException {
+        return switch (this) {
+            case Success<T, C> v -> v.inner();
+            case Failure<T, C> _ -> throw new NoSuchElementException("Result is a failure");
+        };
     }
 
     default <T2> Result<T2, C> map(Function<? super T, ? extends T2> mapper) {
