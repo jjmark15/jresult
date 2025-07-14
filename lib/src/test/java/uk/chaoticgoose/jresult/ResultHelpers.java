@@ -1,0 +1,30 @@
+package uk.chaoticgoose.jresult;
+
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
+abstract class ResultHelpers {
+    private ResultHelpers() {}
+
+    static <T> Result.Success<T, AnException> aSuccess(T value) {
+        return Result.success(value);
+    }
+
+    static <C> Result.Failure<Integer, C> aFailure(C cause) {
+        return Result.failure(cause);
+    }
+
+    static <T> ThrowingResult.Success<T, AnException> aThrowingSuccess(T value) {
+        return Result.throwingSuccess(value);
+    }
+
+    static <C extends Exception> ThrowingResult.Failure<Integer, C> aThrowingFailure(C cause) {
+        return Result.throwingFailure(cause);
+    }
+
+    sealed interface FailureCauses {}
+
+    static final class AnException extends Exception implements FailureCauses {}
+
+    static final class AnotherException extends RuntimeException implements FailureCauses {}
+}

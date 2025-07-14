@@ -2,11 +2,14 @@ package uk.chaoticgoose.jresult;
 
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
+import uk.chaoticgoose.jresult.ResultHelpers.AnException;
+import uk.chaoticgoose.jresult.ResultHelpers.AnotherException;
 
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static uk.chaoticgoose.jresult.ResultHelpers.*;
 
 @NullMarked
 class ResultTest {
@@ -26,7 +29,7 @@ class ResultTest {
 
     @Test
     void throwingFailureThrowsCaughtCause() {
-        assertThatExceptionOfType(Exception.class).isThrownBy(() -> Result.failure(EXCEPTION).valueOrThrow());
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> aFailure(EXCEPTION).valueOrThrow());
     }
 
     @Test
@@ -37,13 +40,13 @@ class ResultTest {
     @Test
     void nonThrowingFailureThrowsNoSuchElementException() {
         assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> Result.failure(1).valueOrThrow())
+                .isThrownBy(() -> aFailure(1).valueOrThrow())
                 .withMessage("Result is a failure");
     }
 
     @Test
     void nonThrowingSuccessReturnsValue() {
-        assertThat(Result.success(VALUE).valueOrThrow()).isEqualTo(VALUE);
+        assertThat(aSuccess(VALUE).valueOrThrow()).isEqualTo(VALUE);
     }
 
     @Test
@@ -60,108 +63,108 @@ class ResultTest {
 
     @Test
     void mapsValueWhenSuccess() {
-        ResultAssert.assertThat(Result.throwingSuccess(1).map(it -> it + 1)).hasSuccessValue(2);
+        ResultAssert.assertThat(aSuccess(1).map(it -> it + 1)).hasSuccessValue(2);
     }
 
     @Test
     void mapsValueWhenFailure() {
-        ResultAssert.assertThat(Result.<Integer, AnException>throwingFailure(EXCEPTION).map(it -> it + 1)).hasFailureCause(EXCEPTION);
+        ResultAssert.assertThat(aThrowingFailure(EXCEPTION).map(it -> it + 1)).hasFailureCause(EXCEPTION);
     }
 
     @Test
     void mapsCauseWhenSuccess() {
-        ResultAssert.assertThat(Result.throwingSuccess(1).mapFailure(RuntimeException::new)).hasSuccessValue(1);
+        ResultAssert.assertThat(aSuccess(1).mapFailure(RuntimeException::new)).hasSuccessValue(1);
     }
 
     @Test
     void mapsCauseWhenFailure() {
         var mapped = new RuntimeException(EXCEPTION);
-        ResultAssert.assertThat(Result.<Integer, AnException>throwingFailure(EXCEPTION).mapFailure((_) -> mapped)).hasFailureCause(mapped);
+        ResultAssert.assertThat(aThrowingFailure(EXCEPTION).mapFailure((_) -> mapped)).hasFailureCause(mapped);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenInitialFailureWithoutExceptionTyping() {
-        ResultAssert.assertThat(ThrowingResult.failure(EXCEPTION)
+        ResultAssert.assertThat(aThrowingFailure(EXCEPTION)
                 .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenInitialFailure() {
-        ResultAssert.assertThat(ThrowingResult.failure(EXCEPTION)
+        ResultAssert.assertThat(aThrowingFailure(EXCEPTION)
                 .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenSecondaryFailureWithoutExceptionTyping() {
-        ResultAssert.assertThat(ThrowingResult.success(VALUE)
+        ResultAssert.assertThat(aThrowingSuccess(VALUE)
                 .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(ANOTHER_EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenSecondaryFailure() {
-        ResultAssert.assertThat(ThrowingResult.success(1)
+        ResultAssert.assertThat(aThrowingSuccess(1)
                 .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(ANOTHER_EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenSuccess() {
-        ResultAssert.assertThat(ThrowingResult.<Integer, AnException>success(1)
+        ResultAssert.assertThat(aThrowingSuccess(1)
                 .mapCatching(AnotherException.class, _ -> 2, cause -> cause.map(c -> c, c -> c)))
             .hasSuccessValue(2);
     }
 
     @Test
     void orElseReturnsValue() {
-        assertThat(Result.success(1).orElse(2)).isEqualTo(1);
+        assertThat(aSuccess(1).orElse(2)).isEqualTo(1);
     }
 
     @Test
     void orElseReturnsValueWhenFailure() {
-        assertThat(Result.failure("failure").orElse(1)).isEqualTo(1);
+        assertThat(aFailure("failure").orElse(1)).isEqualTo(1);
     }
 
     @Test
     void orElseGetReturnsValue() {
-        assertThat(Result.success(1).orElseGet(() -> 2)).isEqualTo(1);
+        assertThat(aSuccess(1).orElseGet(() -> 2)).isEqualTo(1);
     }
 
     @Test
     void orElseGetReturnsValueWhenFailure() {
-        assertThat(Result.failure("failure").orElseGet(() -> 1)).isEqualTo(1);
+        assertThat(aFailure("failure").orElseGet(() -> 1)).isEqualTo(1);
     }
 
     @Test
     void isSuccessWhenSuccess() {
-        assertThat(Result.success(1).isSuccess()).isTrue();
+        assertThat(aSuccess(1).isSuccess()).isTrue();
     }
 
     @Test
     void isNotSuccessWhenFailure() {
-        assertThat(Result.failure(1).isSuccess()).isFalse();
+        assertThat(aFailure(1).isSuccess()).isFalse();
     }
 
     @Test
     void isFailureWhenFailure() {
-        assertThat(Result.failure(1).isFailure()).isTrue();
+        assertThat(aFailure(1).isFailure()).isTrue();
     }
 
     @Test
     void isNotFailureWhenSuccess() {
-        assertThat(Result.success(1).isFailure()).isFalse();
+        assertThat(aSuccess(1).isFailure()).isFalse();
     }
 
     @Test
     void toThrowingWhenSuccess() {
-        ResultAssert.assertThat(Result.success(1).toThrowing(_ -> EXCEPTION)).hasSuccessValue(1);
+        ResultAssert.assertThat(aSuccess(1).toThrowing(_ -> EXCEPTION)).hasSuccessValue(1);
     }
 
     @Test
     void toThrowingWhenFailure() {
-        ResultAssert.assertThat(Result.failure(1).toThrowing(_ -> EXCEPTION)).hasFailureCause(EXCEPTION);
+        ResultAssert.assertThat(aFailure(1).toThrowing(_ -> EXCEPTION)).hasFailureCause(EXCEPTION);
     }
 
     @Test
@@ -190,10 +193,4 @@ class ResultTest {
     private Integer nonThrowingMethod() {
         return VALUE;
     }
-
-    private sealed interface FailureCauses {}
-
-    private static final class AnException extends Exception implements FailureCauses {}
-
-    private static final class AnotherException extends RuntimeException implements FailureCauses {}
 }
