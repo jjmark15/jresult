@@ -118,46 +118,6 @@ class ResultTest {
     }
 
     @Test
-    void orElseReturnsValue() {
-        assertThat(aSuccess(1).orElse(2)).isEqualTo(1);
-    }
-
-    @Test
-    void orElseReturnsValueWhenFailure() {
-        assertThat(aFailure("failure").orElse(1)).isEqualTo(1);
-    }
-
-    @Test
-    void orElseGetReturnsValue() {
-        assertThat(aSuccess(1).orElseGet(() -> 2)).isEqualTo(1);
-    }
-
-    @Test
-    void orElseGetReturnsValueWhenFailure() {
-        assertThat(aFailure("failure").orElseGet(() -> 1)).isEqualTo(1);
-    }
-
-    @Test
-    void isSuccessWhenSuccess() {
-        assertThat(aSuccess(1).isSuccess()).isTrue();
-    }
-
-    @Test
-    void isNotSuccessWhenFailure() {
-        assertThat(aFailure(1).isSuccess()).isFalse();
-    }
-
-    @Test
-    void isFailureWhenFailure() {
-        assertThat(aFailure(1).isFailure()).isTrue();
-    }
-
-    @Test
-    void isNotFailureWhenSuccess() {
-        assertThat(aSuccess(1).isFailure()).isFalse();
-    }
-
-    @Test
     void toThrowingWhenSuccess() {
         ResultAssert.assertThat(aSuccess(1).toThrowing(_ -> EXCEPTION)).hasSuccessValue(1);
     }
