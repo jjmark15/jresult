@@ -74,6 +74,19 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
         };
     }
 
+    default <T2, C2 extends Exception, C3 extends Exception> ThrowingResult<T2, C3> flatMap(
+        Function<T, ThrowingResult<? extends T2, ? extends C2>> mapper,
+        Function<Either<? extends C, ? extends C2>, ? extends C3> causeCombiner
+    ) {
+        return switch (this) {
+            case Success<T, C> s -> switch (mapper.apply(s.inner())) {
+                case Success<? extends T2, ? extends C2> s2 -> new Success<>(s2.inner());
+                case Failure<? extends T2, ? extends C2> f2 -> new Failure<>(causeCombiner.apply(Either.right(f2.inner())));
+            };
+            case Failure<T, C> f -> new Failure<>(causeCombiner.apply(Either.left(f.inner())));
+        };
+    }
+
     default Result<T, C> toNonThrowing() {
         return toNonThrowing(Function.identity());
     }

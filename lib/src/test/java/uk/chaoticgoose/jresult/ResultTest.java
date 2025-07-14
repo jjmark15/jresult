@@ -29,19 +29,19 @@ class ResultTest {
 
     @Test
     void throwingFailureThrowsCaughtCause() {
-        assertThatExceptionOfType(Exception.class).isThrownBy(() -> aFailure(EXCEPTION).valueOrThrow());
+        assertThatExceptionOfType(AnException.class).isThrownBy(() -> aThrowingFailure(EXCEPTION).valueOrThrow());
     }
 
     @Test
     void throwingSuccessReturnsValue() throws Exception {
-        assertThat(Result.success(VALUE).valueOrThrow()).isEqualTo(VALUE);
+        assertThat(aThrowingSuccess(VALUE).valueOrThrow()).isEqualTo(VALUE);
     }
 
     @Test
     void nonThrowingFailureThrowsNoSuchElementException() {
         assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> aFailure(1).valueOrThrow())
-                .withMessage("Result is a failure");
+            .isThrownBy(() -> aFailure(1).valueOrThrow())
+            .withMessage("Result is a failure");
     }
 
     @Test
@@ -73,7 +73,7 @@ class ResultTest {
 
     @Test
     void mapsCauseWhenSuccess() {
-        ResultAssert.assertThat(aSuccess(1).mapFailure(RuntimeException::new)).hasSuccessValue(1);
+        ResultAssert.assertThat(aSuccess(1).mapFailure(AnotherFailureCause::from)).hasSuccessValue(1);
     }
 
     @Test
@@ -85,35 +85,35 @@ class ResultTest {
     @Test
     void combinesThrowingFailuresFromMappingWhenInitialFailureWithoutExceptionTyping() {
         ResultAssert.assertThat(aThrowingFailure(EXCEPTION)
-                .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+                    .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenInitialFailure() {
         ResultAssert.assertThat(aThrowingFailure(EXCEPTION)
-                .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+                    .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenSecondaryFailureWithoutExceptionTyping() {
         ResultAssert.assertThat(aThrowingSuccess(VALUE)
-                .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+                    .mapCatching(_ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(ANOTHER_EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenSecondaryFailure() {
         ResultAssert.assertThat(aThrowingSuccess(1)
-                .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
+                    .mapCatching(AnotherException.class, _ -> anotherThrowingMethod(), cause -> cause.map(c -> c, c -> c)))
             .hasFailureCause(ANOTHER_EXCEPTION);
     }
 
     @Test
     void combinesThrowingFailuresFromMappingWhenSuccess() {
         ResultAssert.assertThat(aThrowingSuccess(1)
-                .mapCatching(AnotherException.class, _ -> 2, cause -> cause.map(c -> c, c -> c)))
+                    .mapCatching(AnotherException.class, _ -> 2, cause -> cause.map(c -> c, c -> c)))
             .hasSuccessValue(2);
     }
 

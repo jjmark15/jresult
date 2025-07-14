@@ -6,7 +6,7 @@ import org.jspecify.annotations.NullMarked;
 abstract class ResultHelpers {
     private ResultHelpers() {}
 
-    static <T> Result.Success<T, AnException> aSuccess(T value) {
+    static <T> Result.Success<T, FailureCause> aSuccess(T value) {
         return Result.success(value);
     }
 
@@ -22,9 +22,22 @@ abstract class ResultHelpers {
         return Result.throwingFailure(cause);
     }
 
+    @NullMarked
     sealed interface FailureCauses {}
 
+    @NullMarked
     static final class AnException extends Exception implements FailureCauses {}
 
+    @NullMarked
     static final class AnotherException extends RuntimeException implements FailureCauses {}
+
+    @NullMarked
+    record FailureCause(int i) implements FailureCauses {}
+
+    @NullMarked
+    record AnotherFailureCause(int i) implements FailureCauses {
+        public static AnotherFailureCause from(FailureCause failureCause) {
+            return new AnotherFailureCause(failureCause.i());
+        }
+    }
 }
