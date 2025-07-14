@@ -39,7 +39,7 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
         };
     }
 
-    default <T2> ThrowingResult<T2, C> map(Function<? super T, ? extends T2> mapper) {
+    default <T2> ThrowingResult<T2, C> map(Function<T, ? extends T2> mapper) {
         return switch (this) {
             case Success<T, C> v -> new Success<>(mapper.apply(v.inner()));
             case Failure<T, C> f -> new Failure<>(f.inner());
@@ -67,7 +67,7 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
         return mapCatching(Exception.class, mapper, failureCombiner);
     }
 
-    default <C2 extends Exception> ThrowingResult<T, C2> mapFailure(Function<? super C, ? extends C2> mapper) {
+    default <C2 extends Exception> ThrowingResult<T, C2> mapFailure(Function<C, ? extends C2> mapper) {
         return switch (this) {
             case Success<T, C> v -> new Success<>(v.inner());
             case Failure<T, C> f -> new Failure<>(mapper.apply(f.inner()));
@@ -78,7 +78,7 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
         return toNonThrowing(Function.identity());
     }
 
-    default <C2> Result<T, C2> toNonThrowing(Function<? super C, ? extends C2> mapper) {
+    default <C2> Result<T, C2> toNonThrowing(Function<C, ? extends C2> mapper) {
         return switch (this) {
             case ThrowingResult.Success<T, C> v -> new Result.Success<>(v.inner());
             case ThrowingResult.Failure<T, C> v -> new  Result.Failure<>(mapper.apply(v.inner()));

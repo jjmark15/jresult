@@ -41,21 +41,21 @@ public sealed interface Result<T, C> extends BaseResult<T, C> permits Result.Suc
         };
     }
 
-    default <T2> Result<T2, C> map(Function<? super T, ? extends T2> mapper) {
+    default <T2> Result<T2, C> map(Function<T, ? extends T2> mapper) {
         return switch (this) {
             case Success<T, C> s -> new Success<>(mapper.apply(s.inner()));
             case Failure<T, C> f -> new Failure<>(f.inner());
         };
     }
 
-    default <C2> Result<T, C2> mapFailure(Function<? super C, ? extends C2> mapper) {
+    default <C2> Result<T, C2> mapFailure(Function<C, ? extends C2> mapper) {
         return switch (this) {
             case Success<T, C> v -> new Success<>(v.inner());
             case Failure<T, C> f -> new Failure<>(mapper.apply(f.inner()));
         };
     }
 
-    default <C2 extends Exception> ThrowingResult<T, C2> toThrowing(Function<? super C, ? extends C2> mapper) {
+    default <C2 extends Exception> ThrowingResult<T, C2> toThrowing(Function<C, ? extends C2> mapper) {
         return switch (this) {
             case Result.Success<T, C> v -> new ThrowingResult.Success<>(v.inner());
             case Result.Failure<T, C> v -> new ThrowingResult.Failure<>(mapper.apply(v.inner()));
