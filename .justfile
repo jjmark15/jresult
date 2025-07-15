@@ -1,0 +1,2 @@
+test:
+    gw :lib:test
