@@ -35,12 +35,44 @@ public class FlatMapTest {
             .hasFailureCause(CAUSE);
     }
 
+    @Test
+    void mapsSuccessToSuccess_withoutCauseCombiner() {
+        assertThat(aSuccess(VALUE).flatMap(this::aSameCauseSuccessfulMapper))
+            .hasSuccessValue(ANOTHER_VALUE);
+    }
+
+    @Test
+    void mapsSuccessToFailure_withoutCauseCombiner() {
+        assertThat(aSuccess(VALUE).flatMap(this::aSameCauseFailingMapper))
+            .hasFailureCause(CAUSE);
+    }
+
+    @Test
+    void mapsFailureToFailure_withoutCauseCombiner() {
+        assertThat(aFailure(CAUSE).flatMap(this::aSameCauseFailingMapper))
+                .hasFailureCause(CAUSE);
+    }
+
+    @Test
+    void mapsFailureToSuccess_withoutCauseCombiner() {
+        assertThat(aFailure(CAUSE).flatMap(this::aSameCauseSuccessfulMapper))
+            .hasFailureCause(CAUSE);
+    }
+
     private Result<AnotherSuccessValue, AnotherFailureCause> aSuccessfulMapper(ASuccessValue value) {
         return Result.success(ANOTHER_VALUE);
     }
 
     private Result<AnotherSuccessValue, AnotherFailureCause> aFailingMapper(ASuccessValue value) {
         return Result.failure(ANOTHER_CAUSE);
+    }
+
+    private Result<AnotherSuccessValue, AFailureCause> aSameCauseSuccessfulMapper(ASuccessValue value) {
+        return Result.success(ANOTHER_VALUE);
+    }
+
+    private Result<AnotherSuccessValue, AFailureCause> aSameCauseFailingMapper(ASuccessValue value) {
+        return Result.failure(CAUSE);
     }
 
     private <C3, C1 extends C3, C2 extends C3> C3 identityCauseMap(Either<C1, C2> cause) {

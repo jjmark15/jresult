@@ -102,6 +102,12 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
         };
     }
 
+    default <T2> ThrowingResult<T2, C> flatMap(
+        Function<T, ThrowingResult<? extends T2, ? extends C>> mapper
+    ) {
+        return flatMap(mapper, cause -> cause.map(c -> c, c -> c));
+    }
+
     default Result<T, C> toNonThrowing() {
         return toNonThrowing(Function.identity());
     }

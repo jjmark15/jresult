@@ -70,6 +70,10 @@ public sealed interface Result<T, C> extends BaseResult<T, C> permits Result.Suc
         };
     }
 
+    default <T2> Result<T2, C> flatMap(Function<T, Result<? extends T2, ? extends C>> mapper) {
+        return flatMap(mapper, cause -> cause.map(c -> c, c -> c));
+    }
+
     default <C2 extends Exception> ThrowingResult<T, C2> toThrowing(Function<C, ? extends C2> mapper) {
         return switch (this) {
             case Result.Success<T, C> v -> new ThrowingResult.Success<>(v.inner());
