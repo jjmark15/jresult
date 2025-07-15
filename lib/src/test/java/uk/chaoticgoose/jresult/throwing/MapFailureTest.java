@@ -8,9 +8,6 @@ import static uk.chaoticgoose.jresult.ResultHelpers.*;
 
 @NullMarked
 public class MapFailureTest {
-    private static final Integer VALUE = 1;
-    private static final AnException CAUSE = new AnException();
-    private static final AnotherException MAPPED_CAUSE = new AnotherException();
 
     @Test
     void successReturnsValue() {
@@ -19,10 +16,10 @@ public class MapFailureTest {
 
     @Test
     void mappedFailureReturnsMappedCause() {
-        assertThat(aThrowingFailure(CAUSE).mapFailure(this::mapCause)).hasFailureCause(MAPPED_CAUSE);
+        assertThat(aThrowingFailure(THROWING_CAUSE).mapFailure(this::mapCause)).hasFailureCause(ANOTHER_THROWING_CAUSE);
     }
 
     private AnotherException mapCause(AnException ignore) {
-        return MAPPED_CAUSE;
+        return ANOTHER_THROWING_CAUSE;
     }
 }

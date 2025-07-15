@@ -1,15 +1,14 @@
 package uk.chaoticgoose.jresult.throwing;
 
 import org.junit.jupiter.api.Test;
-import uk.chaoticgoose.jresult.ResultHelpers.AnException;
 import uk.chaoticgoose.jresult.ThrowingResult;
 
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
+import static uk.chaoticgoose.jresult.ResultHelpers.THROWING_CAUSE;
+import static uk.chaoticgoose.jresult.ResultHelpers.VALUE;
 
 public class FactoryTest {
-    private static final String VALUE = "value";
-    private static final Exception CAUSE = new AnException();
 
     @Test
     void success() {
@@ -18,7 +17,7 @@ public class FactoryTest {
 
     @Test
     void failure() {
-        assertThat(ThrowingResult.failure(CAUSE)).hasFailureCause(CAUSE);
+        assertThat(ThrowingResult.failure(THROWING_CAUSE)).hasFailureCause(THROWING_CAUSE);
     }
 
     @Test

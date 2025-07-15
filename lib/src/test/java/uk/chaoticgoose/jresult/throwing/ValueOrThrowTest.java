@@ -6,10 +6,10 @@ import uk.chaoticgoose.jresult.ThrowingResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static uk.chaoticgoose.jresult.ResultHelpers.THROWING_CAUSE;
+import static uk.chaoticgoose.jresult.ResultHelpers.VALUE;
 
 public class ValueOrThrowTest {
-    private static final String VALUE = "value";
-    private static final Exception CAUSE = new AnException();
 
     @Test
     void successReturnsValue() throws Exception {
@@ -18,6 +18,6 @@ public class ValueOrThrowTest {
 
     @Test
     void failureThrows() {
-        assertThatExceptionOfType(AnException.class).isThrownBy(() -> ThrowingResult.failure(CAUSE).valueOrThrow());
+        assertThatExceptionOfType(AnException.class).isThrownBy(() -> ThrowingResult.failure(THROWING_CAUSE).valueOrThrow());
     }
 }

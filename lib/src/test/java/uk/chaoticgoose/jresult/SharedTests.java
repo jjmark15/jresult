@@ -3,8 +3,8 @@ package uk.chaoticgoose.jresult;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.chaoticgoose.jresult.ResultHelpers.AnException;
+import uk.chaoticgoose.jresult.ResultHelpers.AFailureCause;
 import uk.chaoticgoose.jresult.ResultHelpers.FailureCause;
-import uk.chaoticgoose.jresult.ResultHelpers.FailureCauses;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,21 +17,21 @@ public abstract class SharedTests<BC> {
     abstract <C extends BC> C aCause();
 
     @Nested
-    static class NonThrowingTest extends SharedTests<FailureCauses> {
+    static class NonThrowingTest extends SharedTests<FailureCause> {
         @Override
-        <T, C extends FailureCauses> BaseResult<T, C> success(T value) {
+        <T, C extends FailureCause> BaseResult<T, C> success(T value) {
             return Result.success(value);
         }
 
         @Override
-        <T, C extends FailureCauses> BaseResult<T, C> failure(C cause) {
+        <T, C extends FailureCause> BaseResult<T, C> failure(C cause) {
             return Result.failure(cause);
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        FailureCause aCause() {
-            return new FailureCause(1);
+        AFailureCause aCause() {
+            return new AFailureCause(1);
         }
     }
 

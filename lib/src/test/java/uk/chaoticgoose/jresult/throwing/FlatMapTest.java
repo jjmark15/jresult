@@ -11,44 +11,40 @@ import static uk.chaoticgoose.jresult.ResultHelpers.*;
 
 @NullMarked
 public class FlatMapTest {
-    private static final AnException EXCEPTION = new AnException();
-    private static final AnotherException ANOTHER_EXCEPTION = new AnotherException();
-    private static final int VALUE = 1;
-    private static final String ANOTHER_VALUE = "value";
 
     @Test
     void mapsThrowingSuccessToThrowingSuccess() {
-        assertThat(aThrowingSuccess(VALUE).flatMap(this::aSuccessfulThrowingMapper, cause -> unifyThrowingCauses(cause)))
+        assertThat(aThrowingSuccess(VALUE).flatMap(this::aSuccessfulThrowingMapper, this::identityCauseMap))
             .hasSuccessValue(ANOTHER_VALUE);
     }
 
     @Test
     void mapsThrowingSuccessToThrowingFailure() {
-        assertThat(aThrowingSuccess(VALUE).flatMap(this::aFailingThrowingMapper, cause -> unifyThrowingCauses(cause)))
-            .hasFailureCause(ANOTHER_EXCEPTION);
+        assertThat(aThrowingSuccess(VALUE).flatMap(this::aFailingThrowingMapper, this::identityCauseMap))
+            .hasFailureCause(ANOTHER_THROWING_CAUSE);
     }
 
     @Test
     void mapsThrowingFailureToThrowingFailure() {
-        assertThat(aThrowingFailure(EXCEPTION).flatMap(this::aFailingThrowingMapper, cause -> unifyThrowingCauses(cause)))
-                .hasFailureCause(EXCEPTION);
+        assertThat(aThrowingFailure(THROWING_CAUSE).flatMap(this::aFailingThrowingMapper, this::identityCauseMap))
+                .hasFailureCause(THROWING_CAUSE);
     }
 
     @Test
     void mapsThrowingFailureToThrowingSuccess() {
-        assertThat(aThrowingFailure(EXCEPTION).flatMap(this::aSuccessfulThrowingMapper, cause -> unifyThrowingCauses(cause)))
-            .hasFailureCause(EXCEPTION);
+        assertThat(aThrowingFailure(THROWING_CAUSE).flatMap(this::aSuccessfulThrowingMapper, this::identityCauseMap))
+            .hasFailureCause(THROWING_CAUSE);
     }
 
-    private ThrowingResult<String, AnotherException> aSuccessfulThrowingMapper(int value) {
+    private ThrowingResult<AnotherSuccessValue, AnotherException> aSuccessfulThrowingMapper(ASuccessValue value) {
         return Result.throwingSuccess(ANOTHER_VALUE);
     }
 
-    private ThrowingResult<String, AnotherException> aFailingThrowingMapper(int value) {
-        return Result.throwingFailure(ANOTHER_EXCEPTION);
+    private ThrowingResult<AnotherSuccessValue, AnotherException> aFailingThrowingMapper(ASuccessValue value) {
+        return Result.throwingFailure(ANOTHER_THROWING_CAUSE);
     }
 
-    private Exception unifyThrowingCauses(Either<? extends AnException, ? extends AnotherException> cause) {
+    private  <C3 extends Exception, C1 extends C3, C2 extends C3> C3 identityCauseMap(Either<C1, C2> cause) {
         return cause.map(c -> c, c -> c);
     }
 }

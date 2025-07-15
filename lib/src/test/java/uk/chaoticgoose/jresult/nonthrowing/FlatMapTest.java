@@ -10,44 +10,40 @@ import static uk.chaoticgoose.jresult.ResultHelpers.*;
 
 @NullMarked
 public class FlatMapTest {
-    private static final FailureCause FAILURE_CAUSE = new FailureCause(1);
-    private static final AnotherFailureCause ANOTHER_FAILURE_CAUSE = new AnotherFailureCause(1);
-    private static final int VALUE = 1;
-    private static final String ANOTHER_VALUE = "value";
 
     @Test
     void mapsSuccessToSuccess() {
-        assertThat(aSuccess(VALUE).flatMap(this::aSuccessfulMapper, cause -> unifyCauses(cause)))
+        assertThat(aSuccess(VALUE).flatMap(this::aSuccessfulMapper, this::identityCauseMap))
             .hasSuccessValue(ANOTHER_VALUE);
     }
 
     @Test
     void mapsSuccessToFailure() {
-        assertThat(aSuccess(VALUE).flatMap(this::aFailingMapper, cause -> unifyCauses(cause)))
-            .hasFailureCause(ANOTHER_FAILURE_CAUSE);
+        assertThat(aSuccess(VALUE).flatMap(this::aFailingMapper, this::identityCauseMap))
+            .hasFailureCause(ANOTHER_CAUSE);
     }
 
     @Test
     void mapsFailureToFailure() {
-        assertThat(aFailure(FAILURE_CAUSE).flatMap(this::aFailingMapper, cause -> unifyCauses(cause)))
-                .hasFailureCause(FAILURE_CAUSE);
+        assertThat(aFailure(CAUSE).flatMap(this::aFailingMapper, this::identityCauseMap))
+                .hasFailureCause(CAUSE);
     }
 
     @Test
     void mapsFailureToSuccess() {
-        assertThat(aFailure(FAILURE_CAUSE).flatMap(this::aSuccessfulMapper, cause -> unifyCauses(cause)))
-            .hasFailureCause(FAILURE_CAUSE);
+        assertThat(aFailure(CAUSE).flatMap(this::aSuccessfulMapper, this::identityCauseMap))
+            .hasFailureCause(CAUSE);
     }
 
-    private Result<String, AnotherFailureCause> aSuccessfulMapper(int value) {
+    private Result<AnotherSuccessValue, AnotherFailureCause> aSuccessfulMapper(ASuccessValue value) {
         return Result.success(ANOTHER_VALUE);
     }
 
-    private Result<String, AnotherFailureCause> aFailingMapper(int value) {
-        return Result.failure(new AnotherFailureCause(value));
+    private Result<AnotherSuccessValue, AnotherFailureCause> aFailingMapper(ASuccessValue value) {
+        return Result.failure(ANOTHER_CAUSE);
     }
 
-    private FailureCauses unifyCauses(Either<? extends FailureCause, ? extends AnotherFailureCause> cause) {
+    private <C3, C1 extends C3, C2 extends C3> C3 identityCauseMap(Either<C1, C2> cause) {
         return cause.map(c -> c, c -> c);
     }
 }

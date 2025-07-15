@@ -2,15 +2,13 @@ package uk.chaoticgoose.jresult.nonthrowing;
 
 import org.junit.jupiter.api.Test;
 import uk.chaoticgoose.jresult.Result;
-import uk.chaoticgoose.jresult.ResultHelpers.FailureCause;
-import uk.chaoticgoose.jresult.ResultHelpers.FailureCauses;
 
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
+import static uk.chaoticgoose.jresult.ResultHelpers.CAUSE;
+import static uk.chaoticgoose.jresult.ResultHelpers.VALUE;
 
 public class FactoryTest {
-    private static final String VALUE = "value";
-    private static final FailureCauses CAUSE = new FailureCause(1);
 
     @Test
     void success() {

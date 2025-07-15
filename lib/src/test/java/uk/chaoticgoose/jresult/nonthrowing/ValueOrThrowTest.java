@@ -2,17 +2,15 @@ package uk.chaoticgoose.jresult.nonthrowing;
 
 import org.junit.jupiter.api.Test;
 import uk.chaoticgoose.jresult.Result;
-import uk.chaoticgoose.jresult.ResultHelpers.FailureCause;
-import uk.chaoticgoose.jresult.ResultHelpers.FailureCauses;
 
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static uk.chaoticgoose.jresult.ResultHelpers.CAUSE;
+import static uk.chaoticgoose.jresult.ResultHelpers.VALUE;
 
 public class ValueOrThrowTest {
-    private static final String VALUE = "value";
-    private static final FailureCauses CAUSE = new FailureCause(1);
 
     @Test
     void successReturnsValue() {

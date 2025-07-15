@@ -3,17 +3,13 @@ package uk.chaoticgoose.jresult.nonthrowing;
 import org.jspecify.annotations.NullMarked;
 import org.junit.jupiter.api.Test;
 import uk.chaoticgoose.jresult.ResultHelpers.AnotherFailureCause;
-import uk.chaoticgoose.jresult.ResultHelpers.FailureCause;
+import uk.chaoticgoose.jresult.ResultHelpers.AFailureCause;
 
 import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
-import static uk.chaoticgoose.jresult.ResultHelpers.aFailure;
-import static uk.chaoticgoose.jresult.ResultHelpers.aSuccess;
+import static uk.chaoticgoose.jresult.ResultHelpers.*;
 
 @NullMarked
 public class MapFailureTest {
-    private static final Integer VALUE = 1;
-    private static final FailureCause CAUSE = new FailureCause(1);
-    private static final AnotherFailureCause MAPPED_CAUSE = new AnotherFailureCause(2);
 
     @Test
     void successReturnsValue() {
@@ -22,10 +18,10 @@ public class MapFailureTest {
 
     @Test
     void mappedFailureReturnsMappedCause() {
-        assertThat(aFailure(CAUSE).mapFailure(this::mapCause)).hasFailureCause(MAPPED_CAUSE);
+        assertThat(aFailure(CAUSE).mapFailure(this::mapCause)).hasFailureCause(ANOTHER_CAUSE);
     }
 
-    private AnotherFailureCause mapCause(FailureCause ignore) {
-        return MAPPED_CAUSE;
+    private AnotherFailureCause mapCause(AFailureCause ignore) {
+        return ANOTHER_CAUSE;
     }
 }
