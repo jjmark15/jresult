@@ -11,15 +11,15 @@ public class MapTest {
 
     @Test
     void mappedSuccessReturnsMappedValue() {
-        assertThat(aThrowingSuccess(VALUE).map(this::mapInteger)).hasSuccessValue(ANOTHER_VALUE);
+        assertThat(aThrowingSuccess(VALUE).map(this::mapValue)).hasSuccessValue(ANOTHER_VALUE);
     }
 
     @Test
     void failureReturnsCause() {
-        assertThat(aThrowingFailure(THROWING_CAUSE).map(this::mapInteger)).hasFailureCause(THROWING_CAUSE);
+        assertThat(aThrowingFailure(THROWING_CAUSE).map(this::mapValue)).hasFailureCause(THROWING_CAUSE);
     }
 
-    private AnotherSuccessValue mapInteger(ASuccessValue ignore) {
+    private AnotherSuccessValue mapValue(ASuccessValue ignore) {
         return ANOTHER_VALUE;
     }
 }
