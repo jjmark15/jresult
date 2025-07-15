@@ -4,6 +4,8 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.function.Function;
 
+import static java.util.Objects.requireNonNull;
+
 @NullMarked
 public sealed interface ThrowingResult<T, C extends Exception> extends BaseResult<T, C> permits ThrowingResult.Success, ThrowingResult.Failure {
 
@@ -47,9 +49,9 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
     }
 
     default <T2, C2 extends Exception, C3 extends Exception> ThrowingResult<T2, C3> mapCatching(
-            Class<C2> clazz,
-            ThrowingFunction<T, T2, C2> mapper,
-            Function<Either<? extends C, ? extends C2>, ? extends C3> failureCombiner
+        Class<C2> clazz,
+        ThrowingFunction<T, T2, C2> mapper,
+        Function<Either<? extends C, ? extends C2>, ? extends C3> failureCombiner
     ) {
         return switch (this) {
             case Success<T, C> v -> switch (ThrowingResult.catching(clazz, () -> mapper.apply(v.inner()))) {
@@ -61,10 +63,23 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
     }
 
     default <T2, C3 extends Exception> ThrowingResult<T2, C3> mapCatching(
-            ThrowingFunction<T, T2, Exception> mapper,
-            Function<Either<? extends C, ? extends Exception>, ? extends C3> failureCombiner
+        ThrowingFunction<T, T2, Exception> mapper,
+        Function<Either<? extends C, ? extends Exception>, ? extends C3> failureCombiner
     ) {
         return mapCatching(Exception.class, mapper, failureCombiner);
+    }
+
+    default <T2> ThrowingResult<T2, C> mapCatching(
+        Class<C> clazz,
+        ThrowingFunction<T, T2, C> mapper
+    ) {
+        return mapCatching(clazz, mapper, cause -> cause.map(c -> c, c -> c));
+    }
+
+    default <T2> ThrowingResult<T2, Exception> mapCatching(
+        ThrowingFunction<T, T2, Exception> mapper
+    ) {
+        return mapCatching(Exception.class, mapper, cause -> cause.map(c -> c, c -> c));
     }
 
     default <C2 extends Exception> ThrowingResult<T, C2> mapFailure(Function<C, ? extends C2> mapper) {
@@ -110,9 +125,15 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
 
     @NullMarked
     record Success<T, C extends Exception>(T inner) implements BaseSuccess<T, C>, ThrowingResult<T, C> {
+        public Success {
+            requireNonNull(inner);
+        }
     }
 
     @NullMarked
     record Failure<T, C extends Exception>(C inner) implements BaseFailure<T, C>, ThrowingResult<T, C> {
+        public Failure {
+            requireNonNull(inner);
+        }
     }
 }

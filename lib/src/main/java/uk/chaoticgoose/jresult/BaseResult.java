@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @NullMarked
-sealed interface BaseResult<T, C> permits BaseResult.BaseSuccess, BaseResult.BaseFailure, Result, ThrowingResult {
+public sealed interface BaseResult<T, C> permits BaseResult.BaseSuccess, BaseResult.BaseFailure, Result, ThrowingResult {
 
     default Optional<T> value() {
         return switch (this) {

@@ -59,83 +59,107 @@ public abstract class SharedTests<BC> {
     private static final Integer VALUE = 1;
     private static final Integer ANOTHER_VALUE = 2;
 
-    @Test
-    void value_successReturnsPresentValue() {
-        assertThat(success(VALUE).value()).hasValue(VALUE);
+    @Nested
+    class ValueTest {
+        @Test
+        void successReturnsPresentValue() {
+            assertThat(success(VALUE).value()).hasValue(VALUE);
+        }
+
+        @Test
+        void failureReturnsEmptyValue() {
+            assertThat(failure(aCause()).value()).isEmpty();
+        }
     }
 
-    @Test
-    void value_failureReturnsEmptyValue() {
-        assertThat(failure(aCause()).value()).isEmpty();
+    @Nested
+    class ValueOrNullTest {
+        @Test
+        void successReturnsValue() {
+            assertThat(success(VALUE).valueOrNull()).isEqualTo(VALUE);
+        }
+
+        @Test
+        void failureReturnsNull() {
+            assertThat(failure(aCause()).valueOrNull()).isNull();
+        }
     }
 
-    @Test
-    void valueOrNull_successReturnsValue() {
-        assertThat(success(VALUE).valueOrNull()).isEqualTo(VALUE);
+    @Nested
+    class CauseTest {
+        @Test
+        void failureReturnsCause() {
+            assertThat(failure(aCause()).cause()).contains(aCause());
+        }
+
+        @Test
+        void successReturnsEmpty() {
+            assertThat(success(VALUE).cause()).isEmpty();
+        }
     }
 
-    @Test
-    void valueOrNull_failureReturnsNull() {
-        assertThat(failure(aCause()).valueOrNull()).isNull();
+    @Nested
+    class CauseOrNullTest {
+        @Test
+        void failureReturnsCause() {
+            assertThat(failure(aCause()).causeOrNull()).isEqualTo(aCause());
+        }
+
+        @Test
+        void successReturnsNull() {
+            assertThat(success(VALUE).causeOrNull()).isNull();
+        }
     }
 
-    @Test
-    void cause_failureReturnsCause() {
-        assertThat(failure(aCause()).cause()).contains(aCause());
+    @Nested
+    class OrElseTest {
+        @Test
+        void successReturnsValue() {
+            assertThat(success(VALUE).orElse(ANOTHER_VALUE)).isEqualTo(VALUE);
+        }
+
+        @Test
+        void failureReturnsOtherValue() {
+            assertThat(failure(aCause()).orElse(ANOTHER_VALUE)).isEqualTo(ANOTHER_VALUE);
+        }
     }
 
-    @Test
-    void cause_successReturnsEmpty() {
-        assertThat(success(VALUE).cause()).isEmpty();
+    @Nested
+    class OrElseGetTest {
+        @Test
+        void successReturnsValue() {
+            assertThat(success(VALUE).orElseGet(() -> ANOTHER_VALUE)).isEqualTo(VALUE);
+        }
+
+        @Test
+        void failureReturnsOtherValue() {
+            assertThat(failure(aCause()).orElseGet(() -> ANOTHER_VALUE)).isEqualTo(ANOTHER_VALUE);
+        }
     }
 
-    @Test
-    void causeOrNull_failureReturnsCause() {
-        assertThat(failure(aCause()).causeOrNull()).isEqualTo(aCause());
+    @Nested
+    class IsSuccessTest {
+        @Test
+        void successReturnsTrue() {
+            assertThat(success(VALUE).isSuccess()).isTrue();
+        }
+
+        @Test
+        void failureReturnsFalse() {
+            assertThat(failure(aCause()).isSuccess()).isFalse();
+        }
     }
 
-    @Test
-    void causeOrNull_successReturnsNull() {
-        assertThat(success(VALUE).causeOrNull()).isNull();
-    }
+    @Nested
+    class IsFailureTest {
+        @Test
+        void successReturnsTrue() {
+            assertThat(success(VALUE).isFailure()).isFalse();
+        }
 
-    @Test
-    void orElse_successReturnsValue() {
-        assertThat(success(VALUE).orElse(ANOTHER_VALUE)).isEqualTo(VALUE);
-    }
-
-    @Test
-    void orElse_failureReturnsOtherValue() {
-        assertThat(failure(aCause()).orElse(ANOTHER_VALUE)).isEqualTo(ANOTHER_VALUE);
-    }
-
-    @Test
-    void orElseGet_successReturnsValue() {
-        assertThat(success(VALUE).orElseGet(() -> ANOTHER_VALUE)).isEqualTo(VALUE);
-    }
-
-    @Test
-    void orElseGet_failureReturnsOtherValue() {
-        assertThat(failure(aCause()).orElseGet(() -> ANOTHER_VALUE)).isEqualTo(ANOTHER_VALUE);
-    }
-
-    @Test
-    void isSuccess_successReturnsTrue() {
-        assertThat(success(VALUE).isSuccess()).isTrue();
-    }
-
-    @Test
-    void isSuccess_failureReturnsFalse() {
-        assertThat(failure(aCause()).isSuccess()).isFalse();
-    }
-
-    @Test
-    void isFailure_successReturnsTrue() {
-        assertThat(success(VALUE).isFailure()).isFalse();
-    }
-
-    @Test
-    void isFailure_failureReturnsFalse() {
-        assertThat(failure(aCause()).isFailure()).isTrue() ;
+        @Test
+        void failureReturnsFalse() {
+            assertThat(failure(aCause()).isFailure()).isTrue() ;
+        }
     }
 }
