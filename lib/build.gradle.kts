@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.jspecify)
+    api(libs.jspecify)
     errorprone(libs.nullaway)
     errorprone(libs.errorprone.core)
 
