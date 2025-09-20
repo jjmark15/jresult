@@ -1,4 +1,5 @@
 [tools]
+java = ['openjdk-25.0.0']
 jreleaser = "latest"
 
 [_]
