@@ -1,34 +1,37 @@
 package uk.chaoticgoose.jresult.throwing;
 
-import org.junit.jupiter.api.Test;
+import org.jspecify.annotations.NullMarked;
+import uk.chaoticgoose.jresult.BaseResult;
+import uk.chaoticgoose.jresult.ResultHelpers.ASuccessValue;
+import uk.chaoticgoose.jresult.ResultHelpers.AnException;
 import uk.chaoticgoose.jresult.ThrowingResult;
+import uk.chaoticgoose.jresult.shared.AbstractFactoryTest;
 
-import static org.assertj.core.api.Assertions.assertThatNullPointerException;
-import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
 import static uk.chaoticgoose.jresult.ResultHelpers.THROWING_CAUSE;
 import static uk.chaoticgoose.jresult.ResultHelpers.VALUE;
 
-public class FactoryTest {
+@NullMarked
+public class FactoryTest extends AbstractFactoryTest<ASuccessValue, AnException> {
 
-    @Test
-    void success() {
-        assertThat(ThrowingResult.success(VALUE)).hasSuccessValue(VALUE);
+    @Override
+    protected BaseResult<ASuccessValue, AnException> createSuccess(
+        ASuccessValue successValue
+    ) {
+        return ThrowingResult.success(successValue);
     }
 
-    @Test
-    void failure() {
-        assertThat(ThrowingResult.failure(THROWING_CAUSE)).hasFailureCause(THROWING_CAUSE);
+    @Override
+    protected BaseResult<ASuccessValue, AnException> createFailure(AnException failureCause) {
+        return ThrowingResult.failure(failureCause);
     }
 
-    @Test
-    @SuppressWarnings("all")
-    void successValueMustNotBeNull() {
-        assertThatNullPointerException().isThrownBy(() -> ThrowingResult.success(null));
+    @Override
+    protected ASuccessValue successValue() {
+        return VALUE;
     }
 
-    @Test
-    @SuppressWarnings("all")
-    void failureValueMustNotBeNull() {
-        assertThatNullPointerException().isThrownBy(() -> ThrowingResult.failure(null));
+    @Override
+    protected AnException failureCause() {
+        return THROWING_CAUSE;
     }
 }
