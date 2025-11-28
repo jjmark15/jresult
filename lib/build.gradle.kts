@@ -5,8 +5,8 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("org.jreleaser") version "1.19.0"
     alias(libs.plugins.errorprone)
+    id("org.jreleaser") version "1.19.0"
 }
 
 repositories {
