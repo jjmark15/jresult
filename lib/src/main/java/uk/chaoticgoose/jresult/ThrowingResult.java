@@ -1,12 +1,9 @@
 package uk.chaoticgoose.jresult;
 
-import org.jspecify.annotations.NullMarked;
-
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
-@NullMarked
 public sealed interface ThrowingResult<T, C extends Exception> extends BaseResult<T, C> permits ThrowingResult.Success, ThrowingResult.Failure {
 
     @SuppressWarnings("unchecked")
@@ -119,24 +116,20 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
         };
     }
 
-    @NullMarked
     interface ThrowingSupplier<T, E extends Exception> {
         T supply() throws E;
     }
 
-    @NullMarked
     interface ThrowingFunction<T, R, E extends Exception> {
         R apply(T t) throws E;
     }
 
-    @NullMarked
     record Success<T, C extends Exception>(T inner) implements BaseSuccess<T, C>, ThrowingResult<T, C> {
         public Success {
             requireNonNull(inner);
         }
     }
 
-    @NullMarked
     record Failure<T, C extends Exception>(C inner) implements BaseFailure<T, C>, ThrowingResult<T, C> {
         public Failure {
             requireNonNull(inner);

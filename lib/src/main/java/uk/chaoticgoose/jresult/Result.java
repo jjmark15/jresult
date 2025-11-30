@@ -1,6 +1,5 @@
 package uk.chaoticgoose.jresult;
 
-import org.jspecify.annotations.NullMarked;
 import uk.chaoticgoose.jresult.ThrowingResult.ThrowingSupplier;
 
 import java.util.NoSuchElementException;
@@ -9,7 +8,6 @@ import java.util.function.Function;
 import static java.util.Objects.requireNonNull;
 
 @SuppressWarnings("unused")
-@NullMarked
 public sealed interface Result<T, C> extends BaseResult<T, C> permits Result.Success, Result.Failure {
 
     static <T, C extends Exception> ThrowingResult<T, C> catching(Class<C> clazz, ThrowingSupplier<? extends T, ? extends C> supplier) {
@@ -81,14 +79,12 @@ public sealed interface Result<T, C> extends BaseResult<T, C> permits Result.Suc
         };
     }
 
-    @NullMarked
     record Success<T, C>(T inner) implements BaseSuccess<T, C>, Result<T, C> {
         public Success {
             requireNonNull(inner);
         }
     }
 
-    @NullMarked
     record Failure<T, C>(C inner) implements BaseFailure<T, C>, Result<T, C> {
         public Failure {
             requireNonNull(inner);

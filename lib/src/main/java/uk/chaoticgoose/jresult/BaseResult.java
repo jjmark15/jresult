@@ -1,13 +1,11 @@
 package uk.chaoticgoose.jresult;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-@NullMarked
 public sealed interface BaseResult<T, C> permits BaseResult.BaseSuccess, BaseResult.BaseFailure, Result, ThrowingResult {
 
     default Optional<T> value() {
@@ -50,12 +48,10 @@ public sealed interface BaseResult<T, C> permits BaseResult.BaseSuccess, BaseRes
         return !isSuccess();
     }
 
-    @NullMarked
     sealed interface BaseSuccess<T, C> extends BaseResult<T, C> permits Result.Success, ThrowingResult.Success {
         T inner();
     }
 
-    @NullMarked
     sealed interface BaseFailure<T, C> extends BaseResult<T, C> permits Result.Failure, ThrowingResult.Failure {
         C inner();
     }

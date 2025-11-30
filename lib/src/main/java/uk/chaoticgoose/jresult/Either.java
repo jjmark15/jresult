@@ -1,19 +1,16 @@
 package uk.chaoticgoose.jresult;
 
-import org.jspecify.annotations.NullMarked;
-
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
-@NullMarked
 public sealed interface Either<T, U> {
-    @NullMarked record Left<T, U>(T value) implements Either<T, U> {
+    record Left<T, U>(T value) implements Either<T, U> {
         public Left {
             requireNonNull(value);
         }
     }
-    @NullMarked record Right<T, U>(U value) implements Either<T, U> {
+    record Right<T, U>(U value) implements Either<T, U> {
         public Right {
             requireNonNull(value);
         }

@@ -6,13 +6,11 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.core.importer.ImportOption.Predefined.DO_NOT_INCLUDE_TESTS;
 import static com.tngtech.archunit.lang.conditions.ArchConditions.not;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
 public class NullnessTest {
@@ -30,11 +28,6 @@ public class NullnessTest {
                     }
                 }
             };
-
-    @Test
-    void annotateClassesWithNullMarked() {
-        classes().should().beAnnotatedWith(NullMarked.class).check(CLASSES);
-    }
 
     @Test
     void nullableReturnMethodsMustFollowNamingConvention() {
