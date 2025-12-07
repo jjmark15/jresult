@@ -1,7 +1,9 @@
-package uk.chaoticgoose.jresult;
+package uk.chaoticgoose.jresult.shared;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.chaoticgoose.jresult.BaseResult;
+import uk.chaoticgoose.jresult.Result;
 import uk.chaoticgoose.jresult.ResultHelpers.AnException;
 import uk.chaoticgoose.jresult.ResultHelpers.AFailureCause;
 import uk.chaoticgoose.jresult.ResultHelpers.FailureCause;
@@ -16,7 +18,6 @@ public abstract class SharedTests<BC> {
 
     abstract <C extends BC> C aCause();
 
-    @Nested
     static class NonThrowingTest extends SharedTests<FailureCause> {
         @Override
         <T, C extends FailureCause> BaseResult<T, C> success(T value) {
@@ -35,7 +36,6 @@ public abstract class SharedTests<BC> {
         }
     }
 
-    @Nested
     static class ThrowingTest extends SharedTests<Exception> {
         private static final AnException EXCEPTION = new AnException();
 
