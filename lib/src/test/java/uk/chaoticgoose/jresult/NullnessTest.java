@@ -14,23 +14,29 @@ import static com.tngtech.archunit.lang.conditions.ArchConditions.not;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
 public class NullnessTest {
-    private static final JavaClasses CLASSES = new ClassFileImporter().withImportOption(DO_NOT_INCLUDE_TESTS).importPackages("uk.chaoticgoose.jresult");
+    private static final JavaClasses CLASSES = new ClassFileImporter()
+        .withImportOption(DO_NOT_INCLUDE_TESTS)
+        .importPackages(NullnessTest.class.getPackageName());
 
-    ArchCondition<JavaMethod> beAnnotatedWithNullable =
-            new ArchCondition<>("be annotated with @Nullable") {
-                @Override
-                public void check(JavaMethod method, ConditionEvents events) {
-                    var isAnnotated = method.reflect().getAnnotatedReturnType().getAnnotation(Nullable.class) != null;
+    private static final ArchCondition<JavaMethod> beAnnotatedWithNullable = new ArchCondition<>("be annotated with @Nullable") {
+        @Override
+        public void check(JavaMethod method, ConditionEvents events) {
+            var isAnnotated = method.reflect().getAnnotatedReturnType().getAnnotation(Nullable.class) != null;
 
-                    if (isAnnotated) {
-                        String message = "Method %s is annotated with @Nullable".formatted(method.getFullName());
-                        events.add(SimpleConditionEvent.satisfied(method, message));
-                    }
-                }
-            };
+            if (isAnnotated) {
+                String message = "Method %s is annotated with @Nullable".formatted(method.getFullName());
+                events.add(SimpleConditionEvent.satisfied(method, message));
+            }
+        }
+    };
 
     @Test
     void nullableReturnMethodsMustFollowNamingConvention() {
-        methods().that().arePublic().and().areDeclaredInClassesThat().areNotRecords().and().haveNameNotEndingWith("OrNull").should(not(beAnnotatedWithNullable)).check(CLASSES);
+        methods()
+            .that().arePublic()
+            .and().areDeclaredInClassesThat().areNotRecords()
+            .and().haveNameNotEndingWith("OrNull")
+            .should(not(beAnnotatedWithNullable))
+            .check(CLASSES);
     }
 }
