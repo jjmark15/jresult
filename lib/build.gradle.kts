@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
     implementation(libs.jspecify)
+    errorprone(platform(libs.nullaway.bom))
     errorprone(libs.nullaway)
     errorprone(libs.errorprone.core)
 
