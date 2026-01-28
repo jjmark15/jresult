@@ -15,7 +15,10 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
             if (clazz.isInstance(e)) {
                 return new Failure<>((C) e);
             }
-            throw (RuntimeException) e;
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new RuntimeException(e);
         }
     }
 
@@ -52,10 +55,10 @@ public sealed interface ThrowingResult<T, C extends Exception> extends BaseResul
     ) {
         return switch (this) {
             case Success<T, C> v -> switch (ThrowingResult.catching(clazz, () -> mapper.apply(v.inner()))) {
-                case Success<T2, C2> v2 -> new Success<T2, C3>(v2.inner());
-                case Failure<T2, C2> f2 -> new Failure<T2, C3>(failureCombiner.apply(Either.right(f2.inner())));
+                case Success<T2, C2> v2 -> new Success<>(v2.inner());
+                case Failure<T2, C2> f2 -> new Failure<>(failureCombiner.apply(Either.right(f2.inner())));
             };
-            case Failure<T, C> f -> new Failure<T2, C3>(failureCombiner.apply(Either.left(f.inner())));
+            case Failure<T, C> f -> new Failure<>(failureCombiner.apply(Either.left(f.inner())));
         };
     }
 
