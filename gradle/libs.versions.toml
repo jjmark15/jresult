@@ -1,5 +1,5 @@
 [libraries]
-assertj-bom = { module = "org.assertj:assertj-bom", version = "3.27.6" }
+assertj-bom = { module = "org.assertj:assertj-bom", version = "3.27.7" }
 assertj-core = { module = "org.assertj:assertj-core" }
 archunit = { module = "com.tngtech.archunit:archunit", version = "1.4.1" }
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version = "2.46.0" }
