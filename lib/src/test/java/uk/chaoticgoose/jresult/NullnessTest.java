@@ -5,11 +5,11 @@ import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ConditionEvents;
-import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.core.importer.ImportOption.Predefined.DO_NOT_INCLUDE_TESTS;
+import static com.tngtech.archunit.lang.SimpleConditionEvent.satisfied;
 import static com.tngtech.archunit.lang.conditions.ArchConditions.not;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
@@ -25,7 +25,7 @@ public class NullnessTest {
 
             if (isAnnotated) {
                 String message = "Method %s is annotated with @Nullable".formatted(method.getFullName());
-                events.add(SimpleConditionEvent.satisfied(method, message));
+                events.add(satisfied(method, message));
             }
         }
     };

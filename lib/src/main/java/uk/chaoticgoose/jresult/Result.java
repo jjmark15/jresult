@@ -1,21 +1,24 @@
 package uk.chaoticgoose.jresult;
 
-import uk.chaoticgoose.jresult.ThrowingResult.ThrowingSupplier;
+import org.jspecify.annotations.Nullable;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
-@SuppressWarnings("unused")
-public sealed interface Result<T, C> extends BaseResult<T, C> permits Result.Success, Result.Failure {
-
-    static <T, C extends Exception> ThrowingResult<T, C> catching(Class<C> clazz, ThrowingSupplier<? extends T, ? extends C> supplier) {
-        return ThrowingResult.catching(clazz, supplier);
+public sealed interface Result<T, C> {
+    record Success<T, C>(T inner) implements Result<T, C> {
+        public Success {
+            requireNonNull(inner);
+        }
     }
 
-    static <T> ThrowingResult<T, Exception> catching(ThrowingSupplier<? extends T, ? extends Exception> supplier) {
-        return ThrowingResult.catching(supplier);
+    record Failure<T, C>(C inner) implements Result<T, C> {
+        public Failure {
+            requireNonNull(inner);
+        }
     }
 
     static <T, C> Success<T, C> success(T value) {
@@ -26,68 +29,79 @@ public sealed interface Result<T, C> extends BaseResult<T, C> permits Result.Suc
         return new Failure<>(cause);
     }
 
-    static <T, C extends Exception> ThrowingResult.Success<T, C> throwingSuccess(T value) {
-        return ThrowingResult.success(value);
-    }
-
-    static <T, C extends Exception> ThrowingResult.Failure<T, C> throwingFailure(C cause) {
-        return ThrowingResult.failure(cause);
-    }
-
-    default T valueOrThrow() throws NoSuchElementException {
+    default @Nullable T valueOrNull() {
         return switch (this) {
-            case Success<T, C> v -> v.inner();
+            case Success<T, C> r -> r.inner();
+            case Failure<T, C> _ -> null;
+        };
+    }
+
+    default @Nullable C causeOrNull() {
+        return switch (this) {
+            case Success<T, C> _ -> null;
+            case Failure<T, C> r -> r.inner();
+        };
+    }
+
+    default T valueOrThrow() {
+        return switch (this) {
+            case Success<T, C> r -> r.inner();
             case Failure<T, C> _ -> throw new NoSuchElementException("Result is a failure");
         };
     }
 
-    default <T2> Result<T2, C> map(Function<T, ? extends T2> mapper) {
+    default C causeOrThrow() {
         return switch (this) {
-            case Success<T, C> s -> new Success<>(mapper.apply(s.inner()));
-            case Failure<T, C> f -> new Failure<>(f.inner());
+            case Success<T, C> _ -> throw new NoSuchElementException("Result is a success");
+            case Failure<T, C> r -> r.inner();
         };
     }
 
-    default <C2> Result<T, C2> mapFailure(Function<C, ? extends C2> mapper) {
+    default Optional<T> value() {
         return switch (this) {
-            case Success<T, C> v -> new Success<>(v.inner());
-            case Failure<T, C> f -> new Failure<>(mapper.apply(f.inner()));
+            case Success<T, C> r -> Optional.of(r.inner());
+            case Failure<T, C> _ -> Optional.empty();
         };
     }
 
-    default <T2, C2, C3> Result<T2, C3> flatMap(
-            Function<T, Result<? extends T2, ? extends C2>> mapper,
-            Function<Either<? extends C, ? extends C2>, ? extends C3> causeCombiner
-    ) {
+    default Optional<C> cause() {
         return switch (this) {
-            case Success<T, C> s -> switch (mapper.apply(s.inner())) {
-                case Result.Success<? extends T2, ? extends C2> s2 -> new Success<>(s2.inner());
-                case Result.Failure<? extends T2, ? extends C2> f2 -> new Failure<>(causeCombiner.apply(Either.right(f2.inner())));
-            };
-            case Failure<T, C> f -> new Failure<>(causeCombiner.apply(Either.left(f.inner())));
+            case Success<T, C> _ -> Optional.empty();
+            case Failure<T, C> r -> Optional.of(r.inner());
         };
     }
 
-    default <T2> Result<T2, C> flatMap(Function<T, Result<? extends T2, ? extends C>> mapper) {
-        return flatMap(mapper, cause -> cause.map(c -> c, c -> c));
+    default boolean isSuccess() {
+        return this instanceof Success;
     }
 
-    default <C2 extends Exception> ThrowingResult<T, C2> toThrowing(Function<C, ? extends C2> mapper) {
+    default boolean isFailure() {
+        return this instanceof Failure;
+    }
+
+    default <E extends Exception> T orElseThrow(Function<C, E> function) throws E {
         return switch (this) {
-            case Result.Success<T, C> v -> new ThrowingResult.Success<>(v.inner());
-            case Result.Failure<T, C> v -> new ThrowingResult.Failure<>(mapper.apply(v.inner()));
+            case Success<T, C> r -> r.inner();
+            case Failure<T, C> r -> throw function.apply(r.inner());
         };
     }
 
-    record Success<T, C>(T inner) implements BaseSuccess<T, C>, Result<T, C> {
-        public Success {
-            requireNonNull(inner);
-        }
+    default T orElseThrow() throws NoSuchElementException {
+        return orElseThrow(c -> new NoSuchElementException("Result is a failure"));
     }
 
-    record Failure<T, C>(C inner) implements BaseFailure<T, C>, Result<T, C> {
-        public Failure {
-            requireNonNull(inner);
-        }
+    default <T2, C2> Result<T2, C2> map(Function<T, T2> successMapper, Function<C, C2> failureMapper) {
+        return switch (this) {
+            case Success<T, C> r -> success(successMapper.apply(r.inner()));
+            case Failure<T, C> r -> failure(failureMapper.apply(r.inner()));
+        };
+    }
+
+    default <T2> Result<T2, C> mapSuccess(Function<T, T2> successMapper) {
+        return map(successMapper, c -> c);
+    }
+
+    default <C2> Result<T, C2> mapFailure(Function<C, C2> failureMapper) {
+        return map(v -> v, failureMapper);
     }
 }
