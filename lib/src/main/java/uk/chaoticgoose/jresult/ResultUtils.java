@@ -25,6 +25,10 @@ public final class ResultUtils {
         }
     }
 
+    public static <T> Result<T, Exception> catching(ThrowingSupplier<? extends T, ? extends Exception> supplier) {
+        return catching(Exception.class, supplier);
+    }
+
     public static <T1, T2, C1, C2 extends Exception> Result<T2, C2> mapThrowing(
         Result<T1, C1> result,
         Class<C2> clazz,

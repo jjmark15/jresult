@@ -13,12 +13,12 @@ public class CatchingTest {
     private static final TestException EXCEPTION = anException();
 
     @Test
-    void passesNonThrowingOperationAsSuccess() {
+    void catching_passesNonThrowingOperationAsSuccess() {
         assertThat(catching(TestException.class, () -> VALUE)).hasSuccessValue(VALUE);
     }
 
     @Test
-    void catchesThrowingOperationAsFailure() {
+    void catching_catchesThrowingOperationAsFailure() {
         ThrowingSupplier<TestValue, TestException> func = () -> {
             throw EXCEPTION;
         };
@@ -27,7 +27,7 @@ public class CatchingTest {
     }
 
     @Test
-    void catchesThrowingOperationAsFailure_withSupertype() {
+    void catching_catchesThrowingOperationAsFailure_withSupertype() {
         ThrowingSupplier<TestValue, TestException> func = () -> {
             throw EXCEPTION;
         };
@@ -36,11 +36,25 @@ public class CatchingTest {
     }
 
     @Test
-    void doesNotCatchOtherExceptionTypes() {
+    void catching_doesNotCatchOtherExceptionTypes() {
         ThrowingSupplier<TestValue, TestException> func = () -> {
             throw new RuntimeException();
         };
 
         assertThatRuntimeException().isThrownBy(() -> catching(TestException.class, func));
+    }
+
+    @Test
+    void catchingBase_passesNonThrowingOperationAsSuccess() {
+        assertThat(catching(() -> VALUE)).hasSuccessValue(VALUE);
+    }
+
+    @Test
+    void catchingBase_catchesThrowingOperationAsFailure() {
+        ThrowingSupplier<TestValue, TestException> func = () -> {
+            throw EXCEPTION;
+        };
+
+        assertThat(catching(func)).hasFailureCause(EXCEPTION);
     }
 }
