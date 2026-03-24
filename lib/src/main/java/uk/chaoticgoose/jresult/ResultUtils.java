@@ -1,8 +1,5 @@
 package uk.chaoticgoose.jresult;
 
-import uk.chaoticgoose.jresult.Result.Failure;
-import uk.chaoticgoose.jresult.Result.Success;
-
 import java.util.function.Function;
 
 import static uk.chaoticgoose.jresult.Result.failure;

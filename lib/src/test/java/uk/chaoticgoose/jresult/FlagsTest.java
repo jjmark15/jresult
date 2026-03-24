@@ -1,8 +1,6 @@
 package uk.chaoticgoose.jresult;
 
 import org.junit.jupiter.api.Test;
-import uk.chaoticgoose.jresult.Result.Failure;
-import uk.chaoticgoose.jresult.Result.Success;
 import uk.chaoticgoose.jresult.TestTypes.TestCause;
 import uk.chaoticgoose.jresult.TestTypes.TestValue;
 

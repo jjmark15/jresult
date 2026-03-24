@@ -16,7 +16,7 @@ public class ResultAssert<T, C> extends AbstractAssert<ResultAssert<T, C>, Resul
 
     public ResultAssert<T, C> isFailure() {
         isNotNull();
-        if (actual instanceof Result.Success<T,C>) {
+        if (actual instanceof Success<T,C>) {
             failWithMessage("Expected result to be a failure");
         }
         return this;
@@ -24,7 +24,7 @@ public class ResultAssert<T, C> extends AbstractAssert<ResultAssert<T, C>, Resul
 
     public ResultAssert<T, C> isSuccess() {
         isNotNull();
-        if (actual instanceof Result.Failure<T, C>) {
+        if (actual instanceof Failure<T, C>) {
             failWithMessage("Expected result to be a success");
         }
         return this;
@@ -33,7 +33,7 @@ public class ResultAssert<T, C> extends AbstractAssert<ResultAssert<T, C>, Resul
     public ResultAssert<T, C> hasSuccessValue(T value) {
         isNotNull();
         isSuccess();
-        if (actual instanceof Result.Success<T, C>(T inner)) {
+        if (actual instanceof Success<T, C>(T inner)) {
             if (!inner.equals(value)) {
                 failWithMessage("Expected success value to be <%s> but was <%s>", value, inner);
             }
@@ -44,7 +44,7 @@ public class ResultAssert<T, C> extends AbstractAssert<ResultAssert<T, C>, Resul
     public ResultAssert<T, C> hasFailureCause(C cause) {
         isNotNull();
         isFailure();
-        if (actual instanceof Result.Failure<T, C>(C inner)) {
+        if (actual instanceof Failure<T, C>(C inner)) {
             if (!inner.equals(cause)) {
                 failWithMessage("Expected failure cause to be <%s> but was <%s>", cause, inner);
             }

@@ -6,20 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.util.Objects.requireNonNull;
-
-public sealed interface Result<T, C> {
-    record Success<T, C>(T inner) implements Result<T, C> {
-        public Success {
-            requireNonNull(inner);
-        }
-    }
-
-    record Failure<T, C>(C inner) implements Result<T, C> {
-        public Failure {
-            requireNonNull(inner);
-        }
-    }
+public sealed interface Result<T, C> permits Success, Failure {
 
     static <T, C> Success<T, C> success(T value) {
         return new Success<>(value);
