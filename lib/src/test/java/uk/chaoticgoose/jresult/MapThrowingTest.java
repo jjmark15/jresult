@@ -1,14 +1,12 @@
 package uk.chaoticgoose.jresult;
 
 import org.junit.jupiter.api.Test;
-import uk.chaoticgoose.jresult.ResultUtils.ThrowingFunction;
 
 import java.util.function.Function;
 
 import static uk.chaoticgoose.jresult.Result.failure;
 import static uk.chaoticgoose.jresult.Result.success;
 import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
-import static uk.chaoticgoose.jresult.ResultUtils.mapThrowing;
 import static uk.chaoticgoose.jresult.TestTypes.*;
 
 public class MapThrowingTest {
@@ -23,7 +21,7 @@ public class MapThrowingTest {
     void mapsSuccessWithNonThrowingOperationAsSuccess() {
         ThrowingFunction<TestValue, TestValue2, TestException> func = _ -> VALUE_2;
 
-        assertThat(mapThrowing(SUCCESS, TestException.class, func, this::neverCalled)).hasSuccessValue(VALUE_2);
+        assertThat(Result.mapThrowing(SUCCESS, TestException.class, func, this::neverCalled)).hasSuccessValue(VALUE_2);
     }
 
     @Test
@@ -32,7 +30,7 @@ public class MapThrowingTest {
 
         Function<TestCause, TestException> failureMapper = _ -> EXCEPTION;
 
-        assertThat(mapThrowing(FAILURE, TestException.class, func, failureMapper)).hasFailureCause(EXCEPTION);
+        assertThat(Result.mapThrowing(FAILURE, TestException.class, func, failureMapper)).hasFailureCause(EXCEPTION);
     }
 
     @Test
@@ -41,7 +39,7 @@ public class MapThrowingTest {
             throw EXCEPTION;
         };
 
-        assertThat(mapThrowing(SUCCESS, TestException.class, func, this::neverCalled)).hasFailureCause(EXCEPTION);
+        assertThat(Result.mapThrowing(SUCCESS, TestException.class, func, this::neverCalled)).hasFailureCause(EXCEPTION);
     }
 
     @Test
@@ -52,7 +50,7 @@ public class MapThrowingTest {
 
         Function<TestCause, TestException> failureMapper = _ -> EXCEPTION;
 
-        assertThat(mapThrowing(FAILURE, TestException.class, func, failureMapper)).hasFailureCause(EXCEPTION);
+        assertThat(Result.mapThrowing(FAILURE, TestException.class, func, failureMapper)).hasFailureCause(EXCEPTION);
     }
 
     private <T, U> U neverCalled(T in) {

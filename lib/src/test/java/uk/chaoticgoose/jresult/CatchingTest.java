@@ -1,11 +1,9 @@
 package uk.chaoticgoose.jresult;
 
 import org.junit.jupiter.api.Test;
-import uk.chaoticgoose.jresult.ResultUtils.ThrowingSupplier;
 
 import static org.assertj.core.api.Assertions.assertThatRuntimeException;
 import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
-import static uk.chaoticgoose.jresult.ResultUtils.catching;
 import static uk.chaoticgoose.jresult.TestTypes.*;
 
 public class CatchingTest {
@@ -14,7 +12,7 @@ public class CatchingTest {
 
     @Test
     void catching_passesNonThrowingOperationAsSuccess() {
-        assertThat(catching(TestException.class, () -> VALUE)).hasSuccessValue(VALUE);
+        assertThat(Result.catching(TestException.class, () -> VALUE)).hasSuccessValue(VALUE);
     }
 
     @Test
@@ -23,7 +21,7 @@ public class CatchingTest {
             throw EXCEPTION;
         };
 
-        assertThat(catching(TestException.class, func)).hasFailureCause(EXCEPTION);
+        assertThat(Result.catching(TestException.class, func)).hasFailureCause(EXCEPTION);
     }
 
     @Test
@@ -32,7 +30,7 @@ public class CatchingTest {
             throw EXCEPTION;
         };
 
-        assertThat(catching(Exception.class, func)).hasFailureCause(EXCEPTION);
+        assertThat(Result.catching(Exception.class, func)).hasFailureCause(EXCEPTION);
     }
 
     @Test
@@ -41,12 +39,12 @@ public class CatchingTest {
             throw new RuntimeException();
         };
 
-        assertThatRuntimeException().isThrownBy(() -> catching(TestException.class, func));
+        assertThatRuntimeException().isThrownBy(() -> Result.catching(TestException.class, func));
     }
 
     @Test
     void catchingBase_passesNonThrowingOperationAsSuccess() {
-        assertThat(catching(() -> VALUE)).hasSuccessValue(VALUE);
+        assertThat(Result.catching(() -> VALUE)).hasSuccessValue(VALUE);
     }
 
     @Test
@@ -55,6 +53,6 @@ public class CatchingTest {
             throw EXCEPTION;
         };
 
-        assertThat(catching(func)).hasFailureCause(EXCEPTION);
+        assertThat(Result.catching(func)).hasFailureCause(EXCEPTION);
     }
 }
