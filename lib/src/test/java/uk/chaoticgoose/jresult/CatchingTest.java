@@ -34,6 +34,13 @@ public class CatchingTest {
     }
 
     @Test
+    void catching_passesNonThrowingOperationAsSuccess_withSupertype() {
+        ThrowingSupplier<TestValue, TestException> func = () -> VALUE;
+
+        assertThat(Result.<Object, TestException>catching(TestException.class, func)).hasSuccessValue(VALUE);
+    }
+
+    @Test
     void catching_doesNotCatchOtherExceptionTypes() {
         ThrowingSupplier<TestValue, TestException> func = () -> {
             throw new RuntimeException();
@@ -54,5 +61,21 @@ public class CatchingTest {
         };
 
         assertThat(Result.catching(func)).hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void catchingBase_catchesThrowingOperationAsFailure_withSupertype() {
+        ThrowingSupplier<TestValue, TestException> func = () -> {
+            throw EXCEPTION;
+        };
+
+        assertThat(Result.catching(func)).hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void catchingBase_passesNonThrowingOperationAsSuccess_withSupertype() {
+        ThrowingSupplier<TestValue, TestException> func = () -> VALUE;
+
+        assertThat(Result.<Object>catching(func)).hasSuccessValue(VALUE);
     }
 }
