@@ -102,6 +102,11 @@ public sealed interface Result<T, C> permits Success, Failure {
             if (clazz.isInstance(e)) {
                 return failure(clazz.cast(e));
             }
+
+            if (e instanceof RuntimeException re) {
+                throw re;
+            }
+
             throw new RuntimeException(e);
         }
     }
@@ -117,16 +122,7 @@ public sealed interface Result<T, C> permits Success, Failure {
         Function<C1, ? extends C2> failureMapper
     ) {
         return switch (result) {
-            case Success<? extends T1, ? extends C1> s -> {
-                try {
-                    yield success(throwingFunction.apply(s.inner()));
-                } catch (Exception e) {
-                    if (clazz.isInstance(e)) {
-                        yield failure(clazz.cast(e));
-                    }
-                    throw new RuntimeException(e);
-                }
-            }
+            case Success<? extends T1, ? extends C1> s -> catching(clazz, () -> throwingFunction.apply(s.inner()));
             case Failure<? extends T1, ? extends C1> f -> failure(failureMapper.apply(f.inner()));
         };
     }

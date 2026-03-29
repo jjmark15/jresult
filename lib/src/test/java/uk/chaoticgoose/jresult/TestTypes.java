@@ -30,4 +30,14 @@ public final class TestTypes {
     public static TestException anException() {
         return new TestException(UUID.randomUUID().toString());
     }
+
+    public static class TestRuntimeException extends RuntimeException {
+        public TestRuntimeException(String message) {
+            super(message);
+        }
+    }
+
+    public static TestRuntimeException aRuntimeException() {
+        return new TestRuntimeException(UUID.randomUUID().toString());
+    }
 }

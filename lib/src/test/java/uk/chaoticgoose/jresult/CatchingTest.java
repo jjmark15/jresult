@@ -1,74 +1,107 @@
 package uk.chaoticgoose.jresult;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThatRuntimeException;
+import static org.assertj.core.api.Assertions.*;
 import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
 import static uk.chaoticgoose.jresult.TestTypes.*;
 
 public class CatchingTest {
     private static final TestValue VALUE = aValue();
     private static final TestException EXCEPTION = anException();
+    private static final TestRuntimeException RUNTIME_EXCEPTION = aRuntimeException();
 
-    @Test
-    void catching_passesNonThrowingOperationAsSuccess() {
-        assertThat(Result.catching(TestException.class, () -> VALUE)).hasSuccessValue(VALUE);
+    @Nested
+    class WithClassArgumentTest {
+
+        @Test
+        void passesNonThrowingOperationAsSuccess() {
+            assertThat(Result.catching(TestException.class, () -> VALUE)).hasSuccessValue(VALUE);
+        }
+
+        @Test
+        void catchesThrowingOperationAsFailure() {
+            ThrowingSupplier<TestValue, TestException> mapper = throwingSupplier(EXCEPTION);
+
+            assertThat(Result.catching(TestException.class, mapper)).hasFailureCause(EXCEPTION);
+        }
+
+        @Test
+        void catchesThrowingOperationAsFailure_throwingSubtype() {
+            ThrowingSupplier<TestValue, TestException> mapper = throwingSupplier(EXCEPTION);
+
+            assertThat(Result.catching(Exception.class, mapper)).hasFailureCause(EXCEPTION);
+        }
+
+        @Test
+        void passesNonThrowingOperationAsSuccess_returningSubtype() {
+            ThrowingSupplier<TestValue, TestException> mapper = () -> VALUE;
+
+            Result<Object, TestException> result = Result.catching(TestException.class, mapper);
+
+            assertThat(result).hasSuccessValue(VALUE);
+        }
+
+        @Test
+        void doesNotCatchOtherRuntimeExceptionTypes() {
+            ThrowingSupplier<TestValue, TestException> mapper = () -> {
+                throw RUNTIME_EXCEPTION;
+            };
+
+            assertThatExceptionOfType(TestRuntimeException.class)
+                .isThrownBy(() -> Result.catching(TestException.class, mapper));
+        }
+
+        @Test
+        void catchesRuntimeExceptions() {
+            ThrowingSupplier<TestValue, TestRuntimeException> mapper = throwingSupplier(RUNTIME_EXCEPTION);
+
+            assertThat(Result.catching(TestRuntimeException.class, mapper)).hasFailureCause(RUNTIME_EXCEPTION);
+        }
     }
 
-    @Test
-    void catching_catchesThrowingOperationAsFailure() {
-        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
+    @Nested
+    class WithoutClassArgumentTest {
 
-        assertThat(Result.catching(TestException.class, func)).hasFailureCause(EXCEPTION);
-    }
+        @Test
+        void passesNonThrowingOperationAsSuccess() {
+            assertThat(Result.catching(() -> VALUE)).hasSuccessValue(VALUE);
+        }
 
-    @Test
-    void catching_catchesThrowingOperationAsFailure_withSupertype() {
-        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
+        @Test
+        void catchesThrowingOperationAsFailure() {
+            ThrowingSupplier<TestValue, TestException> mapper = throwingSupplier(EXCEPTION);
 
-        assertThat(Result.catching(Exception.class, func)).hasFailureCause(EXCEPTION);
-    }
+            assertThat(Result.catching(mapper)).hasFailureCause(EXCEPTION);
+        }
 
-    @Test
-    void catching_passesNonThrowingOperationAsSuccess_withSupertype() {
-        ThrowingSupplier<TestValue, TestException> func = () -> VALUE;
+        @Test
+        void catchesThrowingOperationAsFailure_throwingSubtype() {
+            ThrowingSupplier<TestValue, TestException> mapper = throwingSupplier(EXCEPTION);
 
-        assertThat(Result.<Object, TestException>catching(TestException.class, func)).hasSuccessValue(VALUE);
-    }
+            Result<TestValue, Exception> result = Result.catching(mapper);
 
-    @Test
-    void catching_doesNotCatchOtherExceptionTypes() {
-        ThrowingSupplier<TestValue, TestException> func = () -> {
-            throw new RuntimeException();
-        };
+            assertThat(result).hasFailureCause(EXCEPTION);
+        }
 
-        assertThatRuntimeException().isThrownBy(() -> Result.catching(TestException.class, func));
-    }
+        @Test
+        void passesNonThrowingOperationAsSuccess_returningSubtype() {
+            ThrowingSupplier<TestValue, TestException> mapper = () -> VALUE;
 
-    @Test
-    void catchingBase_passesNonThrowingOperationAsSuccess() {
-        assertThat(Result.catching(() -> VALUE)).hasSuccessValue(VALUE);
-    }
+            Result<Object, Exception> result = Result.catching(mapper);
 
-    @Test
-    void catchingBase_catchesThrowingOperationAsFailure() {
-        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
+            assertThat(result).hasSuccessValue(VALUE);
+        }
 
-        assertThat(Result.catching(func)).hasFailureCause(EXCEPTION);
-    }
+        @Test
+        void catchesRuntimeExceptions() {
+            ThrowingSupplier<TestValue, TestException> mapper = () -> {
+                throw RUNTIME_EXCEPTION;
+            };
 
-    @Test
-    void catchingBase_catchesThrowingOperationAsFailure_withSupertype() {
-        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
-
-        assertThat(Result.catching(func)).hasFailureCause(EXCEPTION);
-    }
-
-    @Test
-    void catchingBase_passesNonThrowingOperationAsSuccess_withSupertype() {
-        ThrowingSupplier<TestValue, TestException> func = () -> VALUE;
-
-        assertThat(Result.<Object>catching(func)).hasSuccessValue(VALUE);
+            assertThat(Result.catching(mapper)).hasFailureCause(RUNTIME_EXCEPTION);
+        }
     }
 
     private <T, E extends Exception> ThrowingSupplier<T, E> throwingSupplier(E exception) {
