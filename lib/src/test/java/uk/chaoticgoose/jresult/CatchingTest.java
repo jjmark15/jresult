@@ -17,18 +17,14 @@ public class CatchingTest {
 
     @Test
     void catching_catchesThrowingOperationAsFailure() {
-        ThrowingSupplier<TestValue, TestException> func = () -> {
-            throw EXCEPTION;
-        };
+        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
 
         assertThat(Result.catching(TestException.class, func)).hasFailureCause(EXCEPTION);
     }
 
     @Test
     void catching_catchesThrowingOperationAsFailure_withSupertype() {
-        ThrowingSupplier<TestValue, TestException> func = () -> {
-            throw EXCEPTION;
-        };
+        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
 
         assertThat(Result.catching(Exception.class, func)).hasFailureCause(EXCEPTION);
     }
@@ -56,18 +52,14 @@ public class CatchingTest {
 
     @Test
     void catchingBase_catchesThrowingOperationAsFailure() {
-        ThrowingSupplier<TestValue, TestException> func = () -> {
-            throw EXCEPTION;
-        };
+        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
 
         assertThat(Result.catching(func)).hasFailureCause(EXCEPTION);
     }
 
     @Test
     void catchingBase_catchesThrowingOperationAsFailure_withSupertype() {
-        ThrowingSupplier<TestValue, TestException> func = () -> {
-            throw EXCEPTION;
-        };
+        ThrowingSupplier<TestValue, TestException> func = throwingSupplier(EXCEPTION);
 
         assertThat(Result.catching(func)).hasFailureCause(EXCEPTION);
     }
@@ -77,5 +69,11 @@ public class CatchingTest {
         ThrowingSupplier<TestValue, TestException> func = () -> VALUE;
 
         assertThat(Result.<Object>catching(func)).hasSuccessValue(VALUE);
+    }
+
+    private <T, E extends Exception> ThrowingSupplier<T, E> throwingSupplier(E exception) {
+        return () -> {
+            throw exception;
+        };
     }
 }

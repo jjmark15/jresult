@@ -37,7 +37,6 @@ public class MapThrowingTest {
     @Test
     void mapsFailureWithNonThrowingOperationAsSuccess() {
         ThrowingFunction<TestValue, TestValue2, TestException> func = v -> VALUE_2;
-
         Function<TestCause, TestException> failureMapper = _ -> EXCEPTION;
 
         assertThat(Result.mapThrowing(FAILURE, TestException.class, func, failureMapper)).hasFailureCause(EXCEPTION);
@@ -45,18 +44,14 @@ public class MapThrowingTest {
 
     @Test
     void mapsSuccessWithThrowingOperationAsFailure() {
-        ThrowingFunction<TestValue, TestValue2, TestException> func = _ -> {
-            throw EXCEPTION;
-        };
+        ThrowingFunction<TestValue, TestValue2, TestException> func = mapThrowing(EXCEPTION);
 
         assertThat(Result.mapThrowing(SUCCESS, TestException.class, func, this::neverCalled)).hasFailureCause(EXCEPTION);
     }
 
     @Test
     void mapsSuccessWithThrowingOperationAsFailure_subtype() {
-        ThrowingFunction<TestValue, TestValue2, TestException> func = _ -> {
-            throw EXCEPTION;
-        };
+        ThrowingFunction<TestValue, TestValue2, TestException> func = mapThrowing(EXCEPTION);
         Function<TestCause, TestException> failureMapper = this::neverCalled;
 
         Result<Object, Exception> result = Result.mapThrowing(SUCCESS, Exception.class, func, failureMapper);
@@ -66,10 +61,7 @@ public class MapThrowingTest {
 
     @Test
     void mapsFailureWithThrowingOperationAsFailure() {
-        ThrowingFunction<TestValue, TestValue2, TestException> func = _ -> {
-            throw EXCEPTION;
-        };
-
+        ThrowingFunction<TestValue, TestValue2, TestException> func = mapThrowing(EXCEPTION);
         Function<TestCause, TestException> failureMapper = _ -> EXCEPTION;
 
         assertThat(Result.mapThrowing(FAILURE, TestException.class, func, failureMapper)).hasFailureCause(EXCEPTION);
@@ -77,5 +69,11 @@ public class MapThrowingTest {
 
     private <T, U> U neverCalled(T in) {
         throw new IllegalStateException("should never be called");
+    }
+
+    private <T, U, E extends Exception> ThrowingFunction<T, U, E> mapThrowing(E exception) {
+        return _ -> {
+            throw exception;
+        };
     }
 }
