@@ -25,6 +25,16 @@ public class MapThrowingTest {
     }
 
     @Test
+    void mapsSuccessWithNonThrowingOperationAsSuccess_subtype() {
+        ThrowingFunction<TestValue, TestValue2, TestException> func = _ -> VALUE_2;
+        Function<TestCause, TestException> failureMapper = this::neverCalled;
+
+        Result<Object, Exception> result = Result.mapThrowing(SUCCESS, Exception.class, func, failureMapper);
+
+        assertThat(result).hasSuccessValue(VALUE_2);
+    }
+
+    @Test
     void mapsFailureWithNonThrowingOperationAsSuccess() {
         ThrowingFunction<TestValue, TestValue2, TestException> func = v -> VALUE_2;
 
@@ -40,6 +50,18 @@ public class MapThrowingTest {
         };
 
         assertThat(Result.mapThrowing(SUCCESS, TestException.class, func, this::neverCalled)).hasFailureCause(EXCEPTION);
+    }
+
+    @Test
+    void mapsSuccessWithThrowingOperationAsFailure_subtype() {
+        ThrowingFunction<TestValue, TestValue2, TestException> func = _ -> {
+            throw EXCEPTION;
+        };
+        Function<TestCause, TestException> failureMapper = this::neverCalled;
+
+        Result<Object, Exception> result = Result.mapThrowing(SUCCESS, Exception.class, func, failureMapper);
+
+        assertThat(result).hasFailureCause(EXCEPTION);
     }
 
     @Test

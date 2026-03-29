@@ -77,18 +77,18 @@ public sealed interface Result<T, C> permits Success, Failure {
         return orElseThrow(c -> new NoSuchElementException("Result is a failure"));
     }
 
-    default <T2, C2> Result<T2, C2> map(Function<T, T2> successMapper, Function<C, C2> failureMapper) {
+    default <T2, C2> Result<T2, C2> map(Function<T, ? extends T2> successMapper, Function<C, ? extends C2> failureMapper) {
         return switch (this) {
             case Success<T, C> r -> success(successMapper.apply(r.inner()));
             case Failure<T, C> r -> failure(failureMapper.apply(r.inner()));
         };
     }
 
-    default <T2> Result<T2, C> mapSuccess(Function<T, T2> successMapper) {
+    default <T2> Result<T2, C> mapSuccess(Function<T, ? extends T2> successMapper) {
         return map(successMapper, c -> c);
     }
 
-    default <C2> Result<T, C2> mapFailure(Function<C, C2> failureMapper) {
+    default <C2> Result<T, C2> mapFailure(Function<C, ? extends C2> failureMapper) {
         return map(v -> v, failureMapper);
     }
 
@@ -111,13 +111,13 @@ public sealed interface Result<T, C> permits Success, Failure {
     }
 
     static <T1, T2, C1, C2 extends Exception> Result<T2, C2> mapThrowing(
-        Result<T1, C1> result,
+        Result<? extends T1, ? extends C1> result,
         Class<C2> clazz,
         ThrowingFunction<T1, ? extends T2, ? extends C2> throwingFunction,
         Function<C1, ? extends C2> failureMapper
     ) {
         return switch (result) {
-            case Success<T1, C1> s -> {
+            case Success<? extends T1, ? extends C1> s -> {
                 try {
                     yield success(throwingFunction.apply(s.inner()));
                 } catch (Exception e) {
@@ -127,7 +127,7 @@ public sealed interface Result<T, C> permits Success, Failure {
                     throw new RuntimeException(e);
                 }
             }
-            case Failure<T1, C1> f -> failure(failureMapper.apply(f.inner()));
+            case Failure<? extends T1, ? extends C1> f -> failure(failureMapper.apply(f.inner()));
         };
     }
 }

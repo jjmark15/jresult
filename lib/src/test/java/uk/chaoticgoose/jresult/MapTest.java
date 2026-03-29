@@ -6,6 +6,8 @@ import uk.chaoticgoose.jresult.TestTypes.TestCause2;
 import uk.chaoticgoose.jresult.TestTypes.TestValue;
 import uk.chaoticgoose.jresult.TestTypes.TestValue2;
 
+import java.util.function.Function;
+
 import static uk.chaoticgoose.jresult.Result.failure;
 import static uk.chaoticgoose.jresult.Result.success;
 import static uk.chaoticgoose.jresult.ResultAssert.assertThat;
@@ -26,6 +28,13 @@ public class MapTest {
     }
 
     @Test
+    void mapSuccess_mapsSuccessValue_subtype() {
+        Function<TestValue, TestValue2> mapper = v -> new TestValue2(v.value());
+
+        assertThat(SUCCESS.<Object>mapSuccess(mapper)).hasSuccessValue(VALUE_2);
+    }
+
+    @Test
     void mapSuccess_passesFailureCause() {
         assertThat(FAILURE.mapSuccess(v -> new TestValue2(v.value()))).hasFailureCause(CAUSE);
     }
@@ -33,6 +42,13 @@ public class MapTest {
     @Test
     void mapFailure_mapsFailureCause() {
         assertThat(FAILURE.mapFailure(c -> new TestCause2(c.value()))).hasFailureCause(CAUSE_2);
+    }
+
+    @Test
+    void mapFailure_mapsFailureCause_subtype() {
+        Function<TestCause, TestCause2> mapper = c -> new TestCause2(c.value());
+
+        assertThat(FAILURE.<Object>mapFailure(mapper)).hasFailureCause(CAUSE_2);
     }
 
     @Test
@@ -47,8 +63,24 @@ public class MapTest {
     }
 
     @Test
+    void map_mapsSuccessValue_subtype() {
+        Function<TestValue, TestValue2> valueMapper = v -> new TestValue2(v.value());
+        Function<TestCause, TestCause2> causeMapper = c -> new TestCause2(c.value());
+
+        assertThat(SUCCESS.<Object, Object>map(valueMapper, causeMapper)).hasSuccessValue(VALUE_2);
+    }
+
+    @Test
     void map_mapsFailureCause() {
         assertThat(FAILURE.map(v -> new TestValue2(v.value()), c -> new TestCause2(c.value())))
             .hasFailureCause(CAUSE_2);
+    }
+
+    @Test
+    void map_mapsFailureCause_subtype() {
+        Function<TestValue, TestValue2> valueMapper = v -> new TestValue2(v.value());
+        Function<TestCause, TestCause2> causeMapper = c -> new TestCause2(c.value());
+
+        assertThat(FAILURE.<Object, Object>map(valueMapper, causeMapper)).hasFailureCause(CAUSE_2);
     }
 }
